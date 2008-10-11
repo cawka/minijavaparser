@@ -1,0 +1,566 @@
+options {
+  JAVA_UNICODE_ESCAPE = true;
+  MULTI = true;
+  NODE_EXTENDS = "MyNode";
+}
+
+PARSER_BEGIN(MiniJavaParser)
+import java.util.List;
+import java.util.Vector;
+
+  public class MiniJavaParser {
+  
+  }
+PARSER_END(MiniJavaParser)
+
+SKIP : /* WHITE SPACE */
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| "\f"
+}
+
+SPECIAL_TOKEN : /* COMMENTS */
+{
+  <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+| <FORMAL_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+| <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+}
+
+TOKEN : 
+{
+  < LPAREN: "(" >
+| < RPAREN: ")" >
+| < LSQPAREN: "[" >
+| < RSQPAREN: "]" >
+| < LBRACE: "{" >
+| < RBRACE: "}" >
+| < SEMICOLON: ";" >
+| < DOT: "." >
+| < ASSIGN: "=" >
+| < LT: "<" >
+| < PLUS: "+" >
+| < MINUS: "-" >
+| < AND : "&&" >   
+| < NOT : "!" >   
+| < BOOLEAN: "boolean" >   
+| < CLASS: "class" >
+| < INTERFACE: "interface" >
+| < ELSE: "else" >
+| < EXTENDS: "extends" >
+| < FALSE: "false" >
+| < IF: "if" >
+| < WHILE: "while" >
+| < INTEGER: "int" >   
+| < LENGTH: "length" >
+| < MAIN: "main" >
+| < NEW: "new" >
+| < PUBLIC: "public" >
+| < RETURN: "return" >
+| < STATIC: "static" >
+| < STRING: "String" >
+| < THIS: "this" >
+| < TRUE: "true" >
+| < PRINT: "System.out.println" >
+| < VOID: "void" >         
+}
+
+TOKEN : /* LITERALS */
+{
+  < INTEGER_LITERAL: ( ["1"-"9"] (["0"-"9"])* | "0" ) >
+}
+
+TOKEN : /* IDENTIFIERS */
+{
+  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
+|
+  < #LETTER:
+      [
+       "\u0024",
+       "\u0041"-"\u005a",
+       "\u005f",
+       "\u0061"-"\u007a",
+       "\u00c0"-"\u00d6",
+       "\u00d8"-"\u00f6",
+       "\u00f8"-"\u00ff",
+       "\u0100"-"\u1fff",
+       "\u3040"-"\u318f",
+       "\u3300"-"\u337f",
+       "\u3400"-"\u3d2d",
+       "\u4e00"-"\u9fff",
+       "\uf900"-"\ufaff"
+      ]
+  >
+|
+  < #DIGIT:
+      [
+       "\u0030"-"\u0039",
+       "\u0660"-"\u0669",
+       "\u06f0"-"\u06f9",
+       "\u0966"-"\u096f",
+       "\u09e6"-"\u09ef",
+       "\u0a66"-"\u0a6f",
+       "\u0ae6"-"\u0aef",
+       "\u0b66"-"\u0b6f",
+       "\u0be7"-"\u0bef",
+       "\u0c66"-"\u0c6f",
+       "\u0ce6"-"\u0cef",
+       "\u0d66"-"\u0d6f",
+       "\u0e50"-"\u0e59",
+       "\u0ed0"-"\u0ed9",
+       "\u1040"-"\u1049"
+      ]
+  >
+}
+
+
+/************************************
+ * The MiniJava Grammar Starts Here *
+ ************************************/
+
+
+void Goal() :
+{}
+{
+  MainClass()
+  ( TypeDeclaration() )*
+  <EOF>
+}
+
+void MainClass() :
+{
+	Token t;
+}
+{
+  "class" t=Identifier() "{"
+    "public" "static" "void" "main" "(" "String" "[" "]" Identifier() ")"   
+    "{" PrintStatement( new SymbId(new SymbId( t.image ),"main") )  "}"
+  "}"
+}
+
+void TypeDeclaration() :  
+{}
+{ 
+  LOOKAHEAD(3)
+  ClassDeclaration()
+|
+  ClassExtendsDeclaration()
+}
+
+void ClassDeclaration() :
+{
+	Token t;
+	String oldPath="";
+	Symbols.Class c;
+	SymbId s_id;
+	Symbols.Variable var;
+	Symbols.Function func;
+}
+{
+	"class" t=Identifier()
+	{
+		s_id=new SymbId( t.image );
+		c=new Symbols.Class( s_id, "", jjtThis.pos(jj_input_stream), null );
+		jjtThis._types.put( s_id, c );
+	} 
+  	"{" 
+  		( var =VarDeclaration   (s_id) {c._variables.add(var);} )* 
+        ( func=MethodDeclaration(s_id) {c._methods  .add(func); })*
+    "}"
+}
+
+void ClassExtendsDeclaration() :
+{
+	Token t;
+	Token parentClass;
+	String oldPath;
+	Symbols.Class symbol;
+	Symbols.Class c;
+	SymbId s_id;
+	Symbols.Variable var;
+	Symbols.Function func;
+}
+{
+  "class" t=Identifier() "extends" parentClass=Identifier()
+  {
+  		s_id=new SymbId( t.image );
+  		
+  		c=new Symbols.Class( s_id, "",jjtThis.pos(jj_input_stream), parentClass.image );
+  		jjtThis._types.put( s_id, c );
+  }
+  
+   "{" 
+  		( var =VarDeclaration   (s_id) {c._variables.add(var);} )* 
+        ( func=MethodDeclaration(s_id) {c._methods  .add(func); })*
+  "}"
+}
+
+Symbols.Variable VarDeclaration( SymbId path ) :  
+{ Token t; 
+  String type;
+  String pos;
+  SymbId s_id;
+  Symbols.Variable var;
+ }
+{ 
+	{ pos=jjtThis.pos(jj_input_stream); }
+	type=Type() t=Identifier() ";"
+	{
+		s_id=new SymbId(path,t.image);
+		var=new Symbols.Variable(s_id,type,"",pos);
+		jjtThis._symbols.put( s_id, var );
+		return var;
+	}      
+}
+
+Symbols.Function MethodDeclaration( SymbId path )  :  
+{ Token t; 
+  String type;
+  Symbols.Function func;
+  String pos;
+  SymbId s_id;
+}
+{
+  { pos=jjtThis.pos(jj_input_stream); }
+  "public" type=Type() t=Identifier() 
+  {
+  		s_id=new SymbId( path,t.image );
+		func=new Symbols.Function( s_id,type,"",pos );
+  }
+  
+  "(" ( func._variables=FormalParameterList( s_id ) )? ")"   
+  
+  "{" ( LOOKAHEAD(2) VarDeclaration(s_id) )* 
+      ( Statement(s_id) )* "return" Expression(s_id) ";" "}"
+      
+   {
+   		jjtThis._methods.put( s_id, func );
+   		return func;
+   }
+}
+
+Vector<Symbols.Variable> FormalParameterList(SymbId path) #void :
+{
+	Vector<Symbols.Variable> list=new Vector<Symbols.Variable>();
+	Symbols.Variable par;
+}
+{
+  par=FormalParameter(path) 
+  { list.add( par ); }
+  ( 
+  	par=FormalParameterRest(path)
+  	{ list.add( par ); } 
+  )*
+  
+  { return list; }
+}
+
+Symbols.Variable FormalParameter(SymbId path) :
+{ Token t; 
+  String type;
+  String pos;
+  Symbols.Variable symb; 
+  SymbId s_id;
+}
+{
+	{ 	
+		pos=jjtThis.pos(jj_input_stream); 
+	}
+	type=Type() t=Identifier()
+	{
+		s_id=new SymbId( path, t.image );
+		symb=new Symbols.Variable( s_id,type,"",pos );
+		jjtThis._symbols.put( s_id,symb );
+		return symb;
+	}
+}
+
+Symbols.Variable FormalParameterRest(SymbId path) #void :
+{ Symbols.Variable symb; }
+{
+  "," symb=FormalParameter(path)
+  { return symb; }  
+}
+
+String Type() :
+{ 
+	Token t; 
+	String ret;
+}
+{
+(
+  LOOKAHEAD(3)
+  ret=ArrayType()
+|
+  ret=BooleanType()
+|
+  ret=IntegerType()
+|
+  t=Identifier()  
+  {
+  		ret=t.image;
+  }
+)
+	{ return ret; }   
+}
+
+String ArrayType() :
+{ }
+{  
+  "int" "[" "]"
+  
+  { 
+  		return "int[]";
+  }
+}
+
+String BooleanType() #void :
+{}
+{
+  "boolean"
+  
+  { return "boolean"; }
+}
+
+String IntegerType() #void :
+{}
+{
+  "int"
+  
+  { return "int"; }
+}
+
+void Statement(SymbId scope) :
+{}
+{
+  Block(scope)
+| 
+  LOOKAHEAD(2)
+  AssignmentStatement(scope)
+|
+  LOOKAHEAD(2)
+  ArrayAssignmentStatement(scope)
+|
+  IfStatement(scope)
+|
+  WhileStatement(scope)
+|
+  PrintStatement(scope)
+}
+
+void Block(SymbId scope)  :
+{}
+{
+  "{" ( Statement(scope) )* "}"
+}
+
+void AssignmentStatement(SymbId scope)  :
+{}
+{
+  Identifier() "=" Expression(scope) ";"
+}
+
+void ArrayAssignmentStatement(SymbId scope)  :
+{}
+{
+  Identifier() "[" Expression(scope) "]" "=" Expression(scope) ";"
+}
+
+void IfStatement(SymbId scope)  :
+{}
+{
+  "if" "(" Expression(scope) ")" Statement(scope) "else" Statement(scope) 
+}
+
+void WhileStatement(SymbId scope) :
+{}
+{
+  "while" "(" Expression(scope) ")" Statement(scope) 
+}
+
+void PrintStatement(SymbId scope) #Statement :
+{}
+{
+  "System.out.println" "(" Expression(scope) ")" ";"
+}
+
+void Expression(SymbId scope) :
+{
+	
+}
+{
+  LOOKAHEAD( PrimaryExpression(scope) "&&" )
+  AndExpression(scope)
+|
+  LOOKAHEAD( PrimaryExpression(scope) "<" )
+  CompareExpression(scope)
+|
+  LOOKAHEAD( PrimaryExpression(scope) "+" )
+  PlusExpression(scope)
+|
+  LOOKAHEAD( PrimaryExpression(scope) "-" )
+  MinusExpression(scope)
+|
+  LOOKAHEAD( PrimaryExpression(scope) "*" )
+  TimesExpression(scope)
+|
+  LOOKAHEAD( PrimaryExpression(scope) "[" )
+  ArrayLookup(scope)
+|
+  LOOKAHEAD( PrimaryExpression(scope) "." "length" )
+  ArrayLength(scope)
+|
+  LOOKAHEAD( PrimaryExpression(scope) "." Identifier() "(" )
+  MessageSend(scope)
+| 
+  PrimaryExpression(scope)
+}
+
+void AndExpression(SymbId scope) #void :
+{} 
+{
+  PrimaryExpression(scope) "&&" PrimaryExpression(scope)
+}
+
+void CompareExpression(SymbId scope) #void :
+{} 
+{
+  PrimaryExpression(scope) "<" PrimaryExpression(scope)
+}
+
+void PlusExpression(SymbId scope) #void :
+{}
+{
+  PrimaryExpression(scope) "+" PrimaryExpression(scope)
+}
+
+void MinusExpression(SymbId scope) #void :
+{}
+{
+  PrimaryExpression(scope) "-" PrimaryExpression(scope)
+}
+
+void TimesExpression(SymbId scope) #void :
+{}
+{
+  PrimaryExpression(scope) "*" PrimaryExpression(scope)
+}
+
+void ArrayLookup(SymbId scope) #void :
+{}
+{
+  PrimaryExpression(scope) "[" PrimaryExpression(scope) "]"
+}
+
+void ArrayLength(SymbId scope) #void :
+{}
+{
+  PrimaryExpression(scope) "." "length"
+}
+
+void MessageSend(SymbId scope) #void :
+{}
+{
+  PrimaryExpression(scope) "." Identifier() 
+  "(" ( ExpressionList(scope) )? ")"
+}
+
+void ExpressionList(SymbId scope) #void :
+{}
+{
+  Expression(scope) ( ExpressionRest(scope) )*
+}
+
+void ExpressionRest(SymbId scope) #void :
+{}
+{
+  "," Expression(scope)
+}
+
+String PrimaryExpression(SymbId scope) #void :
+{
+	String ret;
+}
+{
+(
+  IntegerLiteral()
+|
+  TrueLiteral()
+|
+  FalseLiteral()
+|
+  Identifier()
+|
+  ThisExpression(scope)
+  { /*ret=scope;*/ }
+|
+  LOOKAHEAD(3)
+  ArrayAllocationExpression(scope)
+|
+  AllocationExpression(scope)
+|   
+  NotExpression(scope)
+|   
+  BracketExpression(scope)
+  )
+  { return ""; }
+}
+
+void IntegerLiteral() #void :
+{}
+{
+  <INTEGER_LITERAL>
+}
+
+
+void TrueLiteral() #void :
+{}
+{
+  "true"
+}
+
+void FalseLiteral() #void :
+{}
+{
+  "false"
+}
+
+Token Identifier() #void :
+{ Token t; }
+{
+   t=<IDENTIFIER>
+   {return t;}
+}
+
+void ThisExpression(SymbId path) #void :
+{}
+{
+  "this"
+}
+
+void ArrayAllocationExpression(SymbId path) #void :
+{}
+{
+  "new" "int" "[" Expression(path) "]"
+}
+
+void AllocationExpression(SymbId path) #void :
+{}
+{
+  "new" Identifier() "(" ")"
+}
+
+void NotExpression(SymbId path) #void :
+{}
+{
+  "!" Expression(path) 
+}
+
+void BracketExpression(SymbId path) #void :
+{}
+{
+  "(" Expression(path) ")"
+}
+
