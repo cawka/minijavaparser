@@ -163,11 +163,14 @@ void ClassDeclaration() :
 	{
 		s_id=new SymbId( t.image );
 		c=new Symbols.Class( s_id, "", jjtThis.pos(jj_input_stream), null );
+
+		if( jjtThis._symbols.get(new SymbId( s_id,"this" ))==null )
+			jjtThis._symbols.put( new SymbId(s_id,"this"), new Symbols.Variable(new SymbId(s_id,"this"), t.image,"","java") );
 		jjtThis._types.put( s_id, c );
 	} 
   	"{" 
-  		( var =VarDeclaration   (s_id) {c._variables.add(var);} )* 
-        ( func=MethodDeclaration(s_id) {c._methods  .add(func); })*
+  		( var =VarDeclaration   (s_id) {c._variables.put(var ._name.getName(),var);} )* 
+        ( func=MethodDeclaration(s_id) {c._methods  .put(func._name.getName(),func); })*
     "}"
 }
 
@@ -188,12 +191,15 @@ void ClassExtendsDeclaration() :
   		s_id=new SymbId( t.image );
   		
   		c=new Symbols.Class( s_id, "",jjtThis.pos(jj_input_stream), parentClass.image );
+		
+		if( jjtThis._symbols.get(new SymbId( s_id,"this" ))==null )
+			jjtThis._symbols.put( new SymbId(s_id,"this"), new Symbols.Variable(new SymbId(s_id,"this"), t.image,"","java") );
   		jjtThis._types.put( s_id, c );
   }
   
    "{" 
-  		( var =VarDeclaration   (s_id) {c._variables.add(var);} )* 
-        ( func=MethodDeclaration(s_id) {c._methods  .add(func); })*
+  		( var =VarDeclaration   (s_id) {c._variables.put(var. _name.getName(),var);} )* 
+        ( func=MethodDeclaration(s_id) {c._methods  .put(func._name.getName(),func); })*
   "}"
 }
 
@@ -221,6 +227,7 @@ Symbols.Function MethodDeclaration( SymbId path )  :
   Symbols.Function func;
   String pos;
   SymbId s_id;
+  Symbols.Variable ret;
 }
 {
   { pos=jjtThis.pos(jj_input_stream); }
@@ -233,9 +240,10 @@ Symbols.Function MethodDeclaration( SymbId path )  :
   "(" ( func._variables=FormalParameterList( s_id ) )? ")"   
   
   "{" ( LOOKAHEAD(2) VarDeclaration(s_id) )* 
-      ( Statement(s_id) )* "return" Expression(s_id) ";" "}"
+      ( Statement(s_id) )* "return" ret=Expression(s_id) ";" "}" { /* we are only interested if return value is variable or heap */}
       
    {
+   		func._return=ret;
    		jjtThis._methods.put( s_id, func );
    		return func;
    }
@@ -321,7 +329,7 @@ String BooleanType() #void :
 {
   "boolean"
   
-  { return "boolean"; }
+  { return ""; }
 }
 
 String IntegerType() #void :
@@ -329,7 +337,7 @@ String IntegerType() #void :
 {
   "int"
   
-  { return "int"; }
+  { return ""; }
 }
 
 void Statement(SymbId scope) :
@@ -351,33 +359,74 @@ void Statement(SymbId scope) :
 }
 
 void Block(SymbId scope)  :
-{}
 {
+	String unique_name;
+	SymbId subscope;
+}
+{
+	{
+		unique_name="block_"+jjtThis.pos(jj_input_stream);
+		subscope=new SymbId( scope, unique_name );
+	}
   "{" ( Statement(scope) )* "}"
 }
 
 void AssignmentStatement(SymbId scope)  :
-{}
 {
-  Identifier() "=" Expression(scope) ";"
+	Token t;
+	Symbols.Variable left,right;
+}
+{
+  t=Identifier() "=" right=Expression(scope) ";"
+  
+  {
+		left=jjtThis.variableLookup( t.image,scope );
+		if( left==right && right==null ) return; // either int=int or something like this
+		if( (left!=null && right==null) ||
+			(left==null && right!=null) ) 
+		{
+			return;
+			throw new Error( "Syntax error in assignment "+jjtThis.pos(jj_input_stream) );
+		}
+		
+		if( right instanceof Symbols.Heap )
+			jjtThis._vP0.add( new Relations.vP(left,right) );
+		else
+			jjtThis._assign.add( new Relations.vP(left,right) );
+  }
 }
 
-void ArrayAssignmentStatement(SymbId scope)  :
+void ArrayAssignmentStatement(SymbId scope)  : // do not care about this assignment. 
+											   // Because it's applicable only to integer array elements assignments
 {}
 {
   Identifier() "[" Expression(scope) "]" "=" Expression(scope) ";"
 }
 
 void IfStatement(SymbId scope)  :
-{}
 {
-  "if" "(" Expression(scope) ")" Statement(scope) "else" Statement(scope) 
+	String unique_name;
+	SymbId subscope;
+}
+{
+	{
+		unique_name="if_"+jjtThis.pos(jj_input_stream);
+		subscope=new SymbId( scope, unique_name );
+	}
+	"if" "(" Expression(scope) ")" Statement(subscope) "else" Statement(subscope) 
 }
 
 void WhileStatement(SymbId scope) :
-{}
 {
-  "while" "(" Expression(scope) ")" Statement(scope) 
+	String unique_name;
+	SymbId subscope;
+}
+{
+	{
+		unique_name="while_"+jjtThis.pos(jj_input_stream);
+		subscope=new SymbId( scope, unique_name );
+	}
+  "while" "(" Expression(subscope) ")" Statement(subscope) 
 }
 
 void PrintStatement(SymbId scope) #Statement :
@@ -386,36 +435,39 @@ void PrintStatement(SymbId scope) #Statement :
   "System.out.println" "(" Expression(scope) ")" ";"
 }
 
-void Expression(SymbId scope) :
+Symbols.Variable Expression(SymbId scope) :
 {
-	
+	Symbols.Variable ret=null;
 }
 {
+(
   LOOKAHEAD( PrimaryExpression(scope) "&&" )
-  AndExpression(scope)
+  AndExpression(scope) // return value can't be variable or heap
 |
   LOOKAHEAD( PrimaryExpression(scope) "<" )
-  CompareExpression(scope)
+  CompareExpression(scope) // return value can't be variable or heap
 |
   LOOKAHEAD( PrimaryExpression(scope) "+" )
-  PlusExpression(scope)
+  PlusExpression(scope) // return value can be only int type
 |
   LOOKAHEAD( PrimaryExpression(scope) "-" )
-  MinusExpression(scope)
+  MinusExpression(scope) // return value can be only int type
 |
   LOOKAHEAD( PrimaryExpression(scope) "*" )
-  TimesExpression(scope)
+  TimesExpression(scope) // return value can be only int type
 |
   LOOKAHEAD( PrimaryExpression(scope) "[" )
-  ArrayLookup(scope)
+  ArrayLookup(scope) // return value can be only int type
 |
   LOOKAHEAD( PrimaryExpression(scope) "." "length" )
-  ArrayLength(scope)
+  ArrayLength(scope) // return value can be only int type
 |
   LOOKAHEAD( PrimaryExpression(scope) "." Identifier() "(" )
-  MessageSend(scope)
+  ret=MessageSend(scope)
 | 
-  PrimaryExpression(scope)
+  ret=PrimaryExpression(scope)
+)
+	{ return ret; }
 }
 
 void AndExpression(SymbId scope) #void :
@@ -460,28 +512,60 @@ void ArrayLength(SymbId scope) #void :
   PrimaryExpression(scope) "." "length"
 }
 
-void MessageSend(SymbId scope) #void :
-{}
+Symbols.Variable MessageSend(SymbId scope)  :
 {
-  PrimaryExpression(scope) "." Identifier() 
-  "(" ( ExpressionList(scope) )? ")"
+	Symbols.Variable var;
+	Token t;
+	Vector<Symbols.Variable> actual_params=new Vector<Symbols.Variable>();
+	String pos;
+}
+{
+	{ pos=jjtThis.pos(jj_input_stream); }
+
+	  var=PrimaryExpression(scope) "." t=Identifier() 
+	  "(" ( actual_params=ExpressionList(scope) )? ")"
+
+  {
+  		if( var==null ) throw new Error( "Method call on non-class variable ["+pos+"]" );
+		Symbols.ReturnVariable ret=new Symbols.ReturnVariable( new SymbId(scope,t.image+"$call"),"",pos );
+
+   		jjtThis._calls.add( new Symbols.Call(var, t.image, actual_params, "", pos, ret) );
+		
+		jjtThis._symbols.put( new SymbId(scope,t.image+"$call"), ret );
+		return ret;
+  }
 }
 
-void ExpressionList(SymbId scope) #void :
-{}
+Vector<Symbols.Variable> ExpressionList(SymbId scope) #void :
 {
-  Expression(scope) ( ExpressionRest(scope) )*
+	Vector<Symbols.Variable> list=new Vector<Symbols.Variable>();
+	Symbols.Variable var;
+}
+{
+	var=Expression(scope)
+	{ list.add( var ); }
+	 
+	( 
+		var=ExpressionRest(scope) 
+		{ list.add( var ); }
+	)*
+	
+	{ return list; }
 }
 
-void ExpressionRest(SymbId scope) #void :
-{}
+Symbols.Variable ExpressionRest(SymbId scope) #void :
 {
-  "," Expression(scope)
+	Symbols.Variable var; 
+}
+{
+	"," var=Expression(scope)
+	{ return var; }
 }
 
-String PrimaryExpression(SymbId scope) #void :
+Symbols.Variable PrimaryExpression(SymbId scope) :
 {
-	String ret;
+	Symbols.Variable ret=null;
+	Token t;
 }
 {
 (
@@ -491,21 +575,21 @@ String PrimaryExpression(SymbId scope) #void :
 |
   FalseLiteral()
 |
-  Identifier()
+  t=Identifier()
+  { ret=jjtThis.variableLookup(t.image,scope); }
 |
-  ThisExpression(scope)
-  { /*ret=scope;*/ }
+  ret=ThisExpression(scope)
 |
   LOOKAHEAD(3)
-  ArrayAllocationExpression(scope)
+  ret=ArrayAllocationExpression(scope)
 |
-  AllocationExpression(scope)
+  ret=AllocationExpression(scope)
 |   
   NotExpression(scope)
 |   
-  BracketExpression(scope)
+  ret=BracketExpression(scope)
   )
-  { return ""; }
+  { return ret; }
 }
 
 void IntegerLiteral() #void :
@@ -534,22 +618,50 @@ Token Identifier() #void :
    {return t;}
 }
 
-void ThisExpression(SymbId path) #void :
+Symbols.Variable ThisExpression(SymbId path)  :
 {}
 {
   "this"
+  { return jjtThis.variableLookup( "this", path ); }
 }
 
-void ArrayAllocationExpression(SymbId path) #void :
-{}
+Symbols.Variable ArrayAllocationExpression(SymbId path)  :
 {
+	Symbols.Heap heap;
+	String pos;
+}
+{
+  { pos=jjtThis.pos(jj_input_stream); }
   "new" "int" "[" Expression(path) "]"
+  {
+		heap=new Symbols.Heap( new SymbId("new int[]"),"int[]","",pos );
+		jjtThis._heaps.add( heap );
+		return heap; 
+  }
 }
 
-void AllocationExpression(SymbId path) #void :
-{}
+Symbols.Variable AllocationExpression(SymbId path) :
 {
-  "new" Identifier() "(" ")"
+	Symbols.Heap heap;
+	String pos;
+	Token t;
+}
+{
+  { pos=jjtThis.pos(jj_input_stream); }
+  "new" t=Identifier() "(" ")"
+  {
+		heap=new Symbols.Heap( new SymbId("new "+t.image+"()"),t.image,"",pos );
+		jjtThis._heaps.add( heap );
+		
+		Symbols.Variable var=jjtThis._symbols.get( new SymbId(new SymbId( t.image ),"this") );
+		if( var==null ) 
+		{
+			var=new Symbols.Variable( new SymbId(new SymbId( t.image ),"this"),t.image,"","java" );
+			jjtThis._symbols.put( new SymbId(new SymbId( t.image ),"this"), var );
+		}
+
+		return var;
+  }
 }
 
 void NotExpression(SymbId path) #void :
@@ -558,9 +670,12 @@ void NotExpression(SymbId path) #void :
   "!" Expression(path) 
 }
 
-void BracketExpression(SymbId path) #void :
-{}
+Symbols.Variable BracketExpression(SymbId path) #void :
 {
-  "(" Expression(path) ")"
+	Symbols.Variable ret;
+}
+{
+  "(" ret=Expression(path) ")"
+  { return ret; }
 }
 

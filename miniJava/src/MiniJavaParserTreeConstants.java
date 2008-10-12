@@ -20,6 +20,11 @@ public interface MiniJavaParserTreeConstants
   public int JJTIFSTATEMENT = 15;
   public int JJTWHILESTATEMENT = 16;
   public int JJTEXPRESSION = 17;
+  public int JJTMESSAGESEND = 18;
+  public int JJTPRIMARYEXPRESSION = 19;
+  public int JJTTHISEXPRESSION = 20;
+  public int JJTARRAYALLOCATIONEXPRESSION = 21;
+  public int JJTALLOCATIONEXPRESSION = 22;
 
 
   public String[] jjtNodeName = {
@@ -41,5 +46,10 @@ public interface MiniJavaParserTreeConstants
     "IfStatement",
     "WhileStatement",
     "Expression",
+    "MessageSend",
+    "PrimaryExpression",
+    "ThisExpression",
+    "ArrayAllocationExpression",
+    "AllocationExpression",
   };
 }

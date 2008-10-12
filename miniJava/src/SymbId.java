@@ -7,8 +7,6 @@ import java.util.List;
 public class SymbId 
 	implements Comparable, Comparator
 {
-	public List<String> _scope=new LinkedList<String>();
-	
 	public SymbId( final String name ) 
 	{
 		_scope.add( name );
@@ -38,6 +36,14 @@ public class SymbId
 			ret+=i.next();
 			if( i.hasNext() ) ret+=".";
 		}
+		return ret;
+	}
+	
+	public SymbId getPrevScope( )
+	{
+		SymbId ret=new SymbId( _scope );
+		if( ret._scope.size()>0 ) ret._scope.remove( ret._scope.size()-1 );
+		
 		return ret;
 	}
 	
@@ -87,4 +93,8 @@ public class SymbId
 		}
 		return 1;
 	}
+
+	
+	public List<String> _scope=new LinkedList<String>();
+	public int _line; ///< Value will be set during the export process
 }

@@ -1,6 +1,6 @@
 class LinearSearch{
     public static void main(String[] a){
-	System.out.println(new LS().Start(10));
+	System.out.println(new LS().Start(10,new Test()));
     }
 }
 
@@ -14,7 +14,7 @@ class LS {
     
     // Invoke methods to initialize, print and search
     // for elements on the array
-    public int Start(int sz){
+    public int Start(int sz, Test test){
 	int aux01 ;
 	int aux02 ;
 
@@ -96,4 +96,7 @@ class LS {
 	return 0 ;	
     }
 
+}
+
+class Test {
 }

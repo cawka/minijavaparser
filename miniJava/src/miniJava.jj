@@ -249,11 +249,14 @@ void ClassDeclaration() :
 	{
 		s_id=new SymbId( t.image );
 		c=new Symbols.Class( s_id, "", jjtn000.pos(jj_input_stream), null );
+
+		if( jjtn000._symbols.get(new SymbId( s_id,"this" ))==null )
+			jjtn000._symbols.put( new SymbId(s_id,"this"), new Symbols.Variable(new SymbId(s_id,"this"), t.image,"","java") );
 		jjtn000._types.put( s_id, c );
 	} 
   	"{" 
-  		( var =VarDeclaration   (s_id) {c._variables.add(var);} )* 
-        ( func=MethodDeclaration(s_id) {c._methods  .add(func); })*
+  		( var =VarDeclaration   (s_id) {c._variables.put(var ._name.getName(),var);} )* 
+        ( func=MethodDeclaration(s_id) {c._methods  .put(func._name.getName(),func); })*
     "}"/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
@@ -300,12 +303,15 @@ void ClassExtendsDeclaration() :
   		s_id=new SymbId( t.image );
   		
   		c=new Symbols.Class( s_id, "",jjtn000.pos(jj_input_stream), parentClass.image );
+		
+		if( jjtn000._symbols.get(new SymbId( s_id,"this" ))==null )
+			jjtn000._symbols.put( new SymbId(s_id,"this"), new Symbols.Variable(new SymbId(s_id,"this"), t.image,"","java") );
   		jjtn000._types.put( s_id, c );
   }
   
    "{" 
-  		( var =VarDeclaration   (s_id) {c._variables.add(var);} )* 
-        ( func=MethodDeclaration(s_id) {c._methods  .add(func); })*
+  		( var =VarDeclaration   (s_id) {c._variables.put(var. _name.getName(),var);} )* 
+        ( func=MethodDeclaration(s_id) {c._methods  .put(func._name.getName(),func); })*
   "}"/*@bgen(jjtree)*/
   } catch (Throwable jjte000) {
     if (jjtc000) {
@@ -388,6 +394,7 @@ Symbols.Function MethodDeclaration( SymbId path )  :
   Symbols.Function func;
   String pos;
   SymbId s_id;
+  Symbols.Variable ret;
 }
 {/*@bgen(jjtree) MethodDeclaration */
   try {
@@ -402,7 +409,7 @@ Symbols.Function MethodDeclaration( SymbId path )  :
   "(" ( func._variables=FormalParameterList( s_id ) )? ")"   
   
   "{" ( LOOKAHEAD(2) VarDeclaration(s_id) )* 
-      ( Statement(s_id) )* "return" Expression(s_id) ";" "}"/*@bgen(jjtree)*/
+      ( Statement(s_id) )* "return" ret=Expression(s_id) ";" "}" { /* we are only interested if return value is variable or heap */}/*@bgen(jjtree)*/
    {
      jjtree.closeNodeScope(jjtn000, true);
      jjtc000 = false;
@@ -410,6 +417,7 @@ Symbols.Function MethodDeclaration( SymbId path )  :
 /*@egen*/
       
    {
+   		func._return=ret;
    		jjtn000._methods.put( s_id, func );
    		return func;
    }/*@bgen(jjtree)*/
@@ -594,7 +602,7 @@ String BooleanType()       :
 {
   "boolean"
   
-  { return "boolean"; }
+  { return ""; }
 }
 
 String IntegerType()       :
@@ -602,7 +610,7 @@ String IntegerType()       :
 {
   "int"
   
-  { return "int"; }
+  { return ""; }
 }
 
 void Statement(SymbId scope) :
@@ -651,46 +659,77 @@ void Statement(SymbId scope) :
 
 void Block(SymbId scope)  :
 {/*@bgen(jjtree) Block */
-  ASTBlock jjtn000 = new ASTBlock(JJTBLOCK);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
-{/*@bgen(jjtree) Block */
-  try {
+        ASTBlock jjtn000 = new ASTBlock(JJTBLOCK);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
 /*@egen*/
+	String unique_name;
+	SymbId subscope;
+}
+{/*@bgen(jjtree) Block */
+        try {
+/*@egen*/
+	{
+		unique_name="block_"+jjtn000.pos(jj_input_stream);
+		subscope=new SymbId( scope, unique_name );
+	}
   "{" ( Statement(scope) )* "}"/*@bgen(jjtree)*/
-  } catch (Throwable jjte000) {
-    if (jjtc000) {
-      jjtree.clearNodeScope(jjtn000);
-      jjtc000 = false;
-    } else {
-      jjtree.popNode();
-    }
-    if (jjte000 instanceof RuntimeException) {
-      throw (RuntimeException)jjte000;
-    }
-    if (jjte000 instanceof ParseException) {
-      throw (ParseException)jjte000;
-    }
-    throw (Error)jjte000;
-  } finally {
-    if (jjtc000) {
-      jjtree.closeNodeScope(jjtn000, true);
-    }
-  }
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
 /*@egen*/
 }
 
 void AssignmentStatement(SymbId scope)  :
 {/*@bgen(jjtree) AssignmentStatement */
-  ASTAssignmentStatement jjtn000 = new ASTAssignmentStatement(JJTASSIGNMENTSTATEMENT);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+        ASTAssignmentStatement jjtn000 = new ASTAssignmentStatement(JJTASSIGNMENTSTATEMENT);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Token t;
+	Symbols.Variable left,right;
+}
 {/*@bgen(jjtree) AssignmentStatement */
   try {
 /*@egen*/
-  Identifier() "=" Expression(scope) ";"/*@bgen(jjtree)*/
+  t=Identifier() "=" right=Expression(scope) ";"/*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+  
+  {
+		left=jjtn000.variableLookup( t.image,scope );
+		if( left==right && right==null ) return; // either int=int or something like this
+		if( (left!=null && right==null) ||
+			(left==null && right!=null) ) 
+		{
+			return;
+			throw new Error( "Syntax error in assignment "+jjtn000.pos(jj_input_stream) );
+		}
+		
+		if( right instanceof Symbols.Heap )
+			jjtn000._vP0.add( new Relations.vP(left,right) );
+		else
+			jjtn000._assign.add( new Relations.vP(left,right) );
+  }/*@bgen(jjtree)*/
   } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -713,7 +752,8 @@ void AssignmentStatement(SymbId scope)  :
 /*@egen*/
 }
 
-void ArrayAssignmentStatement(SymbId scope)  :
+void ArrayAssignmentStatement(SymbId scope)  : // do not care about this assignment. 
+											   // Because it's applicable only to integer array elements assignments
 {/*@bgen(jjtree) ArrayAssignmentStatement */
   ASTArrayAssignmentStatement jjtn000 = new ASTArrayAssignmentStatement(JJTARRAYASSIGNMENTSTATEMENT);
   boolean jjtc000 = true;
@@ -747,65 +787,79 @@ void ArrayAssignmentStatement(SymbId scope)  :
 
 void IfStatement(SymbId scope)  :
 {/*@bgen(jjtree) IfStatement */
-  ASTIfStatement jjtn000 = new ASTIfStatement(JJTIFSTATEMENT);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
-{/*@bgen(jjtree) IfStatement */
-  try {
+        ASTIfStatement jjtn000 = new ASTIfStatement(JJTIFSTATEMENT);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
 /*@egen*/
-  "if" "(" Expression(scope) ")" Statement(scope) "else" Statement(scope)/*@bgen(jjtree)*/
-  } catch (Throwable jjte000) {
-    if (jjtc000) {
-      jjtree.clearNodeScope(jjtn000);
-      jjtc000 = false;
-    } else {
-      jjtree.popNode();
-    }
-    if (jjte000 instanceof RuntimeException) {
-      throw (RuntimeException)jjte000;
-    }
-    if (jjte000 instanceof ParseException) {
-      throw (ParseException)jjte000;
-    }
-    throw (Error)jjte000;
-  } finally {
-    if (jjtc000) {
-      jjtree.closeNodeScope(jjtn000, true);
-    }
-  }
+	String unique_name;
+	SymbId subscope;
+}
+{/*@bgen(jjtree) IfStatement */
+        try {
+/*@egen*/
+	{
+		unique_name="if_"+jjtn000.pos(jj_input_stream);
+		subscope=new SymbId( scope, unique_name );
+	}
+	"if" "(" Expression(scope) ")" Statement(subscope) "else" Statement(subscope)/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
 /*@egen*/ 
 }
 
 void WhileStatement(SymbId scope) :
 {/*@bgen(jjtree) WhileStatement */
-  ASTWhileStatement jjtn000 = new ASTWhileStatement(JJTWHILESTATEMENT);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
-{/*@bgen(jjtree) WhileStatement */
-  try {
+        ASTWhileStatement jjtn000 = new ASTWhileStatement(JJTWHILESTATEMENT);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
 /*@egen*/
-  "while" "(" Expression(scope) ")" Statement(scope)/*@bgen(jjtree)*/
-  } catch (Throwable jjte000) {
-    if (jjtc000) {
-      jjtree.clearNodeScope(jjtn000);
-      jjtc000 = false;
-    } else {
-      jjtree.popNode();
-    }
-    if (jjte000 instanceof RuntimeException) {
-      throw (RuntimeException)jjte000;
-    }
-    if (jjte000 instanceof ParseException) {
-      throw (ParseException)jjte000;
-    }
-    throw (Error)jjte000;
-  } finally {
-    if (jjtc000) {
-      jjtree.closeNodeScope(jjtn000, true);
-    }
-  }
+	String unique_name;
+	SymbId subscope;
+}
+{/*@bgen(jjtree) WhileStatement */
+        try {
+/*@egen*/
+	{
+		unique_name="while_"+jjtn000.pos(jj_input_stream);
+		subscope=new SymbId( scope, unique_name );
+	}
+  "while" "(" Expression(subscope) ")" Statement(subscope)/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
 /*@egen*/ 
 }
 
@@ -841,61 +895,69 @@ void PrintStatement(SymbId scope)            :
 /*@egen*/
 }
 
-void Expression(SymbId scope) :
+Symbols.Variable Expression(SymbId scope) :
 {/*@bgen(jjtree) Expression */
-  ASTExpression jjtn000 = new ASTExpression(JJTEXPRESSION);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+        ASTExpression jjtn000 = new ASTExpression(JJTEXPRESSION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
 /*@egen*/
-	
+	Symbols.Variable ret=null;
 }
 {/*@bgen(jjtree) Expression */
-  try {
+try {
 /*@egen*/
+(
   LOOKAHEAD( PrimaryExpression(scope) "&&" )
-  AndExpression(scope)
+  AndExpression(scope) // return value can't be variable or heap
 |
   LOOKAHEAD( PrimaryExpression(scope) "<" )
-  CompareExpression(scope)
+  CompareExpression(scope) // return value can't be variable or heap
 |
   LOOKAHEAD( PrimaryExpression(scope) "+" )
-  PlusExpression(scope)
+  PlusExpression(scope) // return value can be only int type
 |
   LOOKAHEAD( PrimaryExpression(scope) "-" )
-  MinusExpression(scope)
+  MinusExpression(scope) // return value can be only int type
 |
   LOOKAHEAD( PrimaryExpression(scope) "*" )
-  TimesExpression(scope)
+  TimesExpression(scope) // return value can be only int type
 |
   LOOKAHEAD( PrimaryExpression(scope) "[" )
-  ArrayLookup(scope)
+  ArrayLookup(scope) // return value can be only int type
 |
   LOOKAHEAD( PrimaryExpression(scope) "." "length" )
-  ArrayLength(scope)
+  ArrayLength(scope) // return value can be only int type
 |
   LOOKAHEAD( PrimaryExpression(scope) "." Identifier() "(" )
-  MessageSend(scope)
+  ret=MessageSend(scope)
 | 
-  PrimaryExpression(scope)/*@bgen(jjtree)*/
-  } catch (Throwable jjte000) {
-    if (jjtc000) {
-      jjtree.clearNodeScope(jjtn000);
-      jjtc000 = false;
-    } else {
-      jjtree.popNode();
-    }
-    if (jjte000 instanceof RuntimeException) {
-      throw (RuntimeException)jjte000;
-    }
-    if (jjte000 instanceof ParseException) {
-      throw (ParseException)jjte000;
-    }
-    throw (Error)jjte000;
-  } finally {
-    if (jjtc000) {
-      jjtree.closeNodeScope(jjtn000, true);
-    }
+  ret=PrimaryExpression(scope)
+)/*@bgen(jjtree)*/
+        {
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+        }
+/*@egen*/
+	{ return ret; }/*@bgen(jjtree)*/
+} catch (Throwable jjte000) {
+  if (jjtc000) {
+    jjtree.clearNodeScope(jjtn000);
+    jjtc000 = false;
+  } else {
+    jjtree.popNode();
   }
+  if (jjte000 instanceof RuntimeException) {
+    throw (RuntimeException)jjte000;
+  }
+  if (jjte000 instanceof ParseException) {
+    throw (ParseException)jjte000;
+  }
+  throw (Error)jjte000;
+} finally {
+  if (jjtc000) {
+    jjtree.closeNodeScope(jjtn000, true);
+  }
+}
 /*@egen*/
 }
 
@@ -941,30 +1003,99 @@ void ArrayLength(SymbId scope)       :
   PrimaryExpression(scope) "." "length"
 }
 
-void MessageSend(SymbId scope)       :
-{}
-{
-  PrimaryExpression(scope) "." Identifier() 
-  "(" ( ExpressionList(scope) )? ")"
+Symbols.Variable MessageSend(SymbId scope)  :
+{/*@bgen(jjtree) MessageSend */
+        ASTMessageSend jjtn000 = new ASTMessageSend(JJTMESSAGESEND);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Symbols.Variable var;
+	Token t;
+	Vector<Symbols.Variable> actual_params=new Vector<Symbols.Variable>();
+	String pos;
+}
+{/*@bgen(jjtree) MessageSend */
+        try {
+/*@egen*/
+	{ pos=jjtn000.pos(jj_input_stream); }
+
+	  var=PrimaryExpression(scope) "." t=Identifier() 
+	  "(" ( actual_params=ExpressionList(scope) )? ")"/*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+
+  {
+  		if( var==null ) throw new Error( "Method call on non-class variable ["+pos+"]" );
+		Symbols.ReturnVariable ret=new Symbols.ReturnVariable( new SymbId(scope,t.image+"$call"),"",pos );
+
+   		jjtn000._calls.add( new Symbols.Call(var, t.image, actual_params, "", pos, ret) );
+		
+		jjtn000._symbols.put( new SymbId(scope,t.image+"$call"), ret );
+		return ret;
+  }/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
 }
 
-void ExpressionList(SymbId scope)       :
-{}
+Vector<Symbols.Variable> ExpressionList(SymbId scope)       :
 {
-  Expression(scope) ( ExpressionRest(scope) )*
+	Vector<Symbols.Variable> list=new Vector<Symbols.Variable>();
+	Symbols.Variable var;
+}
+{
+	var=Expression(scope)
+	{ list.add( var ); }
+	 
+	( 
+		var=ExpressionRest(scope) 
+		{ list.add( var ); }
+	)*
+	
+	{ return list; }
 }
 
-void ExpressionRest(SymbId scope)       :
-{}
+Symbols.Variable ExpressionRest(SymbId scope)       :
 {
-  "," Expression(scope)
+	Symbols.Variable var; 
+}
+{
+	"," var=Expression(scope)
+	{ return var; }
 }
 
-String PrimaryExpression(SymbId scope)       :
-{
-	String ret;
+Symbols.Variable PrimaryExpression(SymbId scope) :
+{/*@bgen(jjtree) PrimaryExpression */
+        ASTPrimaryExpression jjtn000 = new ASTPrimaryExpression(JJTPRIMARYEXPRESSION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Symbols.Variable ret=null;
+	Token t;
 }
-{
+{/*@bgen(jjtree) PrimaryExpression */
+try {
+/*@egen*/
 (
   IntegerLiteral()
 |
@@ -972,21 +1103,46 @@ String PrimaryExpression(SymbId scope)       :
 |
   FalseLiteral()
 |
-  Identifier()
+  t=Identifier()
+  { ret=jjtn000.variableLookup(t.image,scope); }
 |
-  ThisExpression(scope)
-  { /*ret=scope;*/ }
+  ret=ThisExpression(scope)
 |
   LOOKAHEAD(3)
-  ArrayAllocationExpression(scope)
+  ret=ArrayAllocationExpression(scope)
 |
-  AllocationExpression(scope)
+  ret=AllocationExpression(scope)
 |   
   NotExpression(scope)
 |   
-  BracketExpression(scope)
-  )
-  { return ""; }
+  ret=BracketExpression(scope)
+  )/*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+  { return ret; }/*@bgen(jjtree)*/
+} catch (Throwable jjte000) {
+  if (jjtc000) {
+    jjtree.clearNodeScope(jjtn000);
+    jjtc000 = false;
+  } else {
+    jjtree.popNode();
+  }
+  if (jjte000 instanceof RuntimeException) {
+    throw (RuntimeException)jjte000;
+  }
+  if (jjte000 instanceof ParseException) {
+    throw (ParseException)jjte000;
+  }
+  throw (Error)jjte000;
+} finally {
+  if (jjtc000) {
+    jjtree.closeNodeScope(jjtn000, true);
+  }
+}
+/*@egen*/
 }
 
 void IntegerLiteral()       :
@@ -1015,22 +1171,129 @@ Token Identifier()       :
    {return t;}
 }
 
-void ThisExpression(SymbId path)       :
-{}
-{
-  "this"
+Symbols.Variable ThisExpression(SymbId path)  :
+{/*@bgen(jjtree) ThisExpression */
+  ASTThisExpression jjtn000 = new ASTThisExpression(JJTTHISEXPRESSION);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) ThisExpression */
+  try {
+/*@egen*/
+  "this"/*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+  { return jjtn000.variableLookup( "this", path ); }/*@bgen(jjtree)*/
+  } finally {
+    if (jjtc000) {
+      jjtree.closeNodeScope(jjtn000, true);
+    }
+  }
+/*@egen*/
 }
 
-void ArrayAllocationExpression(SymbId path)       :
-{}
-{
-  "new" "int" "[" Expression(path) "]"
+Symbols.Variable ArrayAllocationExpression(SymbId path)  :
+{/*@bgen(jjtree) ArrayAllocationExpression */
+        ASTArrayAllocationExpression jjtn000 = new ASTArrayAllocationExpression(JJTARRAYALLOCATIONEXPRESSION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Symbols.Heap heap;
+	String pos;
+}
+{/*@bgen(jjtree) ArrayAllocationExpression */
+  try {
+/*@egen*/
+  { pos=jjtn000.pos(jj_input_stream); }
+  "new" "int" "[" Expression(path) "]"/*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+  {
+		heap=new Symbols.Heap( new SymbId("new int[]"),"int[]","",pos );
+		jjtn000._heaps.add( heap );
+		return heap; 
+  }/*@bgen(jjtree)*/
+  } catch (Throwable jjte000) {
+    if (jjtc000) {
+      jjtree.clearNodeScope(jjtn000);
+      jjtc000 = false;
+    } else {
+      jjtree.popNode();
+    }
+    if (jjte000 instanceof RuntimeException) {
+      throw (RuntimeException)jjte000;
+    }
+    if (jjte000 instanceof ParseException) {
+      throw (ParseException)jjte000;
+    }
+    throw (Error)jjte000;
+  } finally {
+    if (jjtc000) {
+      jjtree.closeNodeScope(jjtn000, true);
+    }
+  }
+/*@egen*/
 }
 
-void AllocationExpression(SymbId path)       :
-{}
-{
-  "new" Identifier() "(" ")"
+Symbols.Variable AllocationExpression(SymbId path) :
+{/*@bgen(jjtree) AllocationExpression */
+        ASTAllocationExpression jjtn000 = new ASTAllocationExpression(JJTALLOCATIONEXPRESSION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	Symbols.Heap heap;
+	String pos;
+	Token t;
+}
+{/*@bgen(jjtree) AllocationExpression */
+  try {
+/*@egen*/
+  { pos=jjtn000.pos(jj_input_stream); }
+  "new" t=Identifier() "(" ")"/*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+  {
+		heap=new Symbols.Heap( new SymbId("new "+t.image+"()"),t.image,"",pos );
+		jjtn000._heaps.add( heap );
+		
+		Symbols.Variable var=jjtn000._symbols.get( new SymbId(new SymbId( t.image ),"this") );
+		if( var==null ) 
+		{
+			var=new Symbols.Variable( new SymbId(new SymbId( t.image ),"this"),t.image,"","java" );
+			jjtn000._symbols.put( new SymbId(new SymbId( t.image ),"this"), var );
+		}
+				
+		return var;
+  }/*@bgen(jjtree)*/
+  } catch (Throwable jjte000) {
+    if (jjtc000) {
+      jjtree.clearNodeScope(jjtn000);
+      jjtc000 = false;
+    } else {
+      jjtree.popNode();
+    }
+    if (jjte000 instanceof RuntimeException) {
+      throw (RuntimeException)jjte000;
+    }
+    if (jjte000 instanceof ParseException) {
+      throw (ParseException)jjte000;
+    }
+    throw (Error)jjte000;
+  } finally {
+    if (jjtc000) {
+      jjtree.closeNodeScope(jjtn000, true);
+    }
+  }
+/*@egen*/
 }
 
 void NotExpression(SymbId path)       :
@@ -1039,9 +1302,12 @@ void NotExpression(SymbId path)       :
   "!" Expression(path) 
 }
 
-void BracketExpression(SymbId path)       :
-{}
+Symbols.Variable BracketExpression(SymbId path)       :
 {
-  "(" Expression(path) ")"
+	Symbols.Variable ret;
+}
+{
+  "(" ret=Expression(path) ")"
+  { return ret; }
 }
 
