@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Vector;
 
 
 public class MyParser {
@@ -15,24 +16,27 @@ public class MyParser {
 		{
 			System.out.println(
 "Program usage: \n" +
-"    java MyParser <DIR> <SOURCE>\n\n" +
+"    java -jar parser.jar <DIR> <SOURCE>\n\n" +
 "<DIR>    - destination directory for .map and .bdd file placement\n" +
 "<SOURCE> - source miniJava program to analyze"
 );
 			return;
 		}
 		
+		String working_directory=args[0];
+		String source_file      =args[1];
+		
 //		MiniJavaParser parser;
 		try
 		{
-			MiniJavaParser parser=new MiniJavaParser( new java.io.FileInputStream(args[0]) );
+			MiniJavaParser parser=new MiniJavaParser( new java.io.FileInputStream(source_file) );
 			
 			MiniJavaParser.Goal();
 			MiniJavaParser.jjtree.rootNode().resolveForwardDeclarations( );
 //			System.out.println( "Successfull parsing of "+args[0] );
-			MiniJavaParser.jjtree.rootNode().dump();
 			
-			export( "testdir", MiniJavaParser.jjtree.rootNode() );
+			export( working_directory, MiniJavaParser.jjtree.rootNode() );
+			MiniJavaParser.jjtree.rootNode().dump();
 			
 //			MiniJavaParser.jjtree.rootNode().generateRelations();
 		}
@@ -60,35 +64,44 @@ public class MyParser {
 		exportMapToFile( node._fields.values(), F );
 		
 		// export RELATIONS
-		File vP0=new File( dir+"/vP0.bdd" );
-		exportRelationsToFile( node._vP0, vP0 );
+		File vP0=new File( dir+"/vP0.tuples" );
+		exportRelationsToFile( node._vP0, vP0, "V0:65535 H0:65535" );
 		
-		File assign=new File( dir+"/assign.bdd" );
-		exportRelationsToFile( node._assign, assign );
+		File assign=new File( dir+"/assign.tuples" );
+		exportRelationsToFile( node._assign, assign, "V0:65535 V1:65535" );
+		
+		// to maintain compatibility, create blank files for load and store relations
+		Vector<Object> blank=new Vector<Object>();
+
+		File load =new File( dir+"/load.bdd" ); 
+		exportRelationsToFile( blank, load, "V0:65535 F0:65535 V1:65535" );
+		
+		File store=new File( dir+"/store.bdd" ); 
+		exportRelationsToFile( blank, store, "V0:65535 F0:65535 V1:65535" );
 	}
 	
 	public static void exportMapToFile( Collection list, File file ) throws FileNotFoundException
 	{
-		PrintStream V=new PrintStream( new FileOutputStream( file ) );
+		PrintStream f=new PrintStream( new FileOutputStream( file ) );
 		
-		int lines=0;
+		int lines=1;
 		for( Iterator<Symbols.General> i=list.iterator(); i.hasNext(); )
 		{
 			Symbols.General symb=i.next();
 			symb._name._line=lines++;
-			V.println( symb.toString() );
+			f.println( symb.toString() );
 		}
 	}
 
-	public static void exportRelationsToFile( Collection list, File file ) throws FileNotFoundException
+	public static void exportRelationsToFile( Collection list, File file, String header ) throws FileNotFoundException
 	{
-		PrintStream V=new PrintStream( new FileOutputStream( file ) );
+		PrintStream f=new PrintStream( new FileOutputStream( file ) );
+		f.println( "# "+header );
 		
-		int lines=0;
 		for( Iterator<Object> i=list.iterator(); i.hasNext(); )
 		{
 			Object relation=i.next( );
-			V.println( relation.toString() );
+			f.println( relation.toString() );
 		}
 	}
 }

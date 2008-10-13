@@ -1,0 +1,3 @@
+new LS()(1) [@l3,c42]
+new Test()(2) [@l3,c56]
+new int[](3) [@l85,c30]

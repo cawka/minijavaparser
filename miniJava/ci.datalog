@@ -1,0 +1,30 @@
+#.basedir "benchmark/ci/BinaryTree"
+.basedir "testing"
+#.bddvarorder V1_V0_H1
+
+##############################################
+# MAPS
+##############################################
+V	65535	V.map
+H	65535	H.map
+#F	65535	F.map
+
+##############################################
+#RELATIONS
+##############################################
+vP0	(variable:V0, heap:H0) inputtuples
+#store	(base:V0, field:F0, source:V1) inputtuples
+#load	(base:V0, field:F0, dest:V1) inputtuples
+assign	(dest:V0, source:V1) inputtuples
+
+vP	(variable:V0,heap:H0)		output
+#hP	(base:H1,field:F1,target:H2)	output
+
+##############################################
+#RULES
+##############################################
+vP(v,h) :- vP0(v,h).
+vP(v1,h) :- assign(v1,v2),vP(v2,h).
+#hP(h1,f,h2) :- store(v1,f,v2),vP(v1,h1),vP(v2,h2).
+#vP(v2,h2) :- load(v1,f,v2),vP(v1,h1),hP(h1,f,h2).
+

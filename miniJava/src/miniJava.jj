@@ -1029,11 +1029,11 @@ Symbols.Variable MessageSend(SymbId scope)  :
 
   {
   		if( var==null ) throw new Error( "Method call on non-class variable ["+pos+"]" );
-		Symbols.ReturnVariable ret=new Symbols.ReturnVariable( new SymbId(scope,t.image+"$call"),"",pos );
-
+		
+		Symbols.ReturnVariable ret=new Symbols.ReturnVariable( new SymbId(scope,t.image+"$call"+pos),"",pos );
    		jjtn000._calls.add( new Symbols.Call(var, t.image, actual_params, "", pos, ret) );
 		
-		jjtn000._symbols.put( new SymbId(scope,t.image+"$call"), ret );
+		jjtn000._symbols.put( ret._name, ret );
 		return ret;
   }/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
@@ -1271,7 +1271,7 @@ Symbols.Variable AllocationExpression(SymbId path) :
 			var=new Symbols.Variable( new SymbId(new SymbId( t.image ),"this"),t.image,"","java" );
 			jjtn000._symbols.put( new SymbId(new SymbId( t.image ),"this"), var );
 		}
-				
+
 		return var;
   }/*@bgen(jjtree)*/
   } catch (Throwable jjte000) {

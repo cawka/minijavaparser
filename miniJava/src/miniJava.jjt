@@ -527,11 +527,11 @@ Symbols.Variable MessageSend(SymbId scope)  :
 
   {
   		if( var==null ) throw new Error( "Method call on non-class variable ["+pos+"]" );
-		Symbols.ReturnVariable ret=new Symbols.ReturnVariable( new SymbId(scope,t.image+"$call"),"",pos );
-
+		
+		Symbols.ReturnVariable ret=new Symbols.ReturnVariable( new SymbId(scope,t.image+"$call"+pos),"",pos );
    		jjtThis._calls.add( new Symbols.Call(var, t.image, actual_params, "", pos, ret) );
 		
-		jjtThis._symbols.put( new SymbId(scope,t.image+"$call"), ret );
+		jjtThis._symbols.put( ret._name, ret );
 		return ret;
   }
 }

@@ -36,7 +36,7 @@ public class SymbId
 			ret+=i.next();
 			if( i.hasNext() ) ret+=".";
 		}
-		return ret;
+		return ret+"("+_line+")";
 	}
 	
 	public SymbId getPrevScope( )

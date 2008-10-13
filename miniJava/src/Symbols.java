@@ -50,8 +50,8 @@ public class Symbols {
 		}
 		
 		public void dump( String prefix ) {
-			if( _type==null ) return;
 			super.dump( prefix );
+			if( _type==null ) return;
 			if( _type==null )
 				System.out.println( prefix+"\t"+"Unknown type" );
 			else

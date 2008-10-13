@@ -991,11 +991,11 @@ import java.util.Vector;
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
                 if( var==null ) {if (true) throw new Error( "Method call on non-class variable ["+pos+"]" );}
-                Symbols.ReturnVariable ret=new Symbols.ReturnVariable( new SymbId(scope,t.image+"$call"),"",pos );
 
+                Symbols.ReturnVariable ret=new Symbols.ReturnVariable( new SymbId(scope,t.image+"$call"+pos),"",pos );
                 jjtn000._calls.add( new Symbols.Call(var, t.image, actual_params, "", pos, ret) );
 
-                jjtn000._symbols.put( new SymbId(scope,t.image+"$call"), ret );
+                jjtn000._symbols.put( ret._name, ret );
                 {if (true) return ret;}
     } catch (Throwable jjte000) {
           if (jjtc000) {
