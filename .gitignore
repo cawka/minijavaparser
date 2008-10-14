@@ -3,3 +3,5 @@
 *.ci
 miniJava/testing
 *.bdd
+*.a1
+*.a1.datalog

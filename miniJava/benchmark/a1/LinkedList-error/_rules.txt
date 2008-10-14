@@ -1,0 +1,282 @@
+== Classes ==
+Element(0) [@l7,c15]
+LL(0) [@l217,c9]
+List(0) [@l74,c11]
+int[](0) [java]
+== Variables ==
+Element.Age(0) [@l8,c5]
+Element.Compare.aux02(1) [@l63,c13]
+Element.Compare.num1(2) [@l61,c28]
+Element.Compare.num2(3) [@l61,c37]
+Element.Compare.retval(4) [@l62,c17]
+Element.Equal.Compare$call@l42,c37(5) [@l42,c37]
+Element.Equal.GetAge$call@l41,c29(6) [@l41,c29]
+Element.Equal.aux01(7) [@l36,c13]
+Element.Equal.aux02(8) [@l37,c13]
+Element.Equal.if_@l42,c9.Compare$call@l45,c44(9) [@l45,c44]
+Element.Equal.if_@l42,c9.GetSalary$call@l44,c36(10) [@l44,c36]
+Element.Equal.if_@l42,c9.if_@l45,c13.if_@l47,c17.GetMarried$call@l48,c44(11) [@l48,c44]
+Element.Equal.if_@l42,c9.if_@l45,c13.if_@l47,c17.GetMarried$call@l51,c41(12) [@l51,c41]
+Element.Equal.nt(13) [@l38,c13]
+Element.Equal.other(14) [@l34,c26]
+	: Element(0) [@l7,c15]
+Element.Equal.ret_val(15) [@l35,c17]
+Element.Init.v_Age(16) [@l13,c25]
+Element.Init.v_Married(17) [@l13,c48]
+Element.Init.v_Salary(18) [@l13,c34]
+Element.Married(19) [@l10,c5]
+Element.Salary(20) [@l9,c5]
+Element.this(21) [java]
+	: Element(0) [@l7,c15]
+LL.Start.Delete$call@l264,c27(22) [@l264,c27]
+	: List(0) [@l74,c11]
+LL.Start.Delete$call@l269,c27(23) [@l269,c27]
+	: List(0) [@l74,c11]
+LL.Start.Init$call@l229,c31(24) [@l229,c31]
+LL.Start.Init$call@l231,c26(25) [@l231,c26]
+LL.Start.Init$call@l236,c26(26) [@l236,c26]
+LL.Start.Init$call@l242,c26(27) [@l242,c26]
+LL.Start.Init$call@l249,c26(28) [@l249,c26]
+LL.Start.Init$call@l253,c26(29) [@l253,c26]
+LL.Start.Init$call@l259,c26(30) [@l259,c26]
+LL.Start.Insert$call@l237,c27(31) [@l237,c27]
+	: List(0) [@l74,c11]
+LL.Start.Insert$call@l244,c27(32) [@l244,c27]
+	: List(0) [@l74,c11]
+LL.Start.Insert$call@l250,c27(33) [@l250,c27]
+	: List(0) [@l74,c11]
+LL.Start.Insert$call@l260,c27(34) [@l260,c27]
+	: List(0) [@l74,c11]
+LL.Start.Print$call@l232,c27(35) [@l232,c27]
+LL.Start.Print$call@l238,c27(36) [@l238,c27]
+LL.Start.Print$call@l245,c27(37) [@l245,c27]
+LL.Start.Print$call@l251,c27(38) [@l251,c27]
+LL.Start.Print$call@l261,c27(39) [@l261,c27]
+LL.Start.Print$call@l265,c27(40) [@l265,c27]
+LL.Start.Print$call@l270,c27(41) [@l270,c27]
+LL.Start.Search$call@l254,c39(42) [@l254,c39]
+LL.Start.Search$call@l255,c39(43) [@l255,c39]
+LL.Start.aux01(44) [@l223,c17]
+LL.Start.el01(45) [@l224,c17]
+	: Element(0) [@l7,c15]
+LL.Start.el02(46) [@l225,c17]
+	: Element(0) [@l7,c15]
+LL.Start.el03(47) [@l226,c17]
+	: Element(0) [@l7,c15]
+LL.Start.head(48) [@l221,c14]
+	: List(0) [@l74,c11]
+LL.Start.last_elem(49) [@l222,c14]
+	: List(0) [@l74,c11]
+LL.this(50) [java]
+	: LL(0) [@l217,c9]
+LinkedList.main.Start$call@l3,c42(51) [@l3,c42]
+List.Delete.aux01(52) [@l116,c14]
+	: List(0) [@l74,c11]
+List.Delete.aux04(53) [@l120,c13]
+List.Delete.aux05(54) [@l115,c17]
+List.Delete.e(55) [@l112,c24]
+	: Element(0) [@l7,c15]
+List.Delete.my_head(56) [@l113,c14]
+	: List(0) [@l74,c11]
+List.Delete.nt(57) [@l121,c13]
+List.Delete.prev(58) [@l117,c14]
+	: List(0) [@l74,c11]
+List.Delete.ret_val(59) [@l114,c17]
+List.Delete.var_elem(60) [@l119,c17]
+	: Element(0) [@l7,c15]
+List.Delete.var_end(61) [@l118,c17]
+List.Delete.while_@l131,c9.Equal$call@l132,c24(62) [@l132,c24]
+List.Delete.while_@l131,c9.if_@l132,c13.if_@l134,c17.GetNext$call@l136,c44(63) [@l136,c44]
+	: List(0) [@l74,c11]
+List.Delete.while_@l131,c9.if_@l132,c13.if_@l134,c17.GetNext$call@l140,c55(64) [@l140,c55]
+	: List(0) [@l74,c11]
+List.Delete.while_@l131,c9.if_@l132,c13.if_@l134,c17.SetNext$call@l140,c41(65) [@l140,c41]
+List.Delete.while_@l131,c9.if_@l145,c13.GetElem$call@l149,c41(66) [@l149,c41]
+	: Element(0) [@l7,c15]
+List.Delete.while_@l131,c9.if_@l145,c13.GetEnd$call@l148,c39(67) [@l148,c39]
+List.Delete.while_@l131,c9.if_@l145,c13.GetNext$call@l147,c38(68) [@l147,c38]
+	: List(0) [@l74,c11]
+List.InitNew.v_elem(69) [@l86,c28]
+	: Element(0) [@l7,c15]
+List.InitNew.v_end(70) [@l86,c55]
+List.InitNew.v_next(71) [@l86,c42]
+	: List(0) [@l74,c11]
+List.Insert.InitNew$call@l100,c32(72) [@l100,c32]
+List.Insert.aux02(73) [@l97,c14]
+	: List(0) [@l74,c11]
+List.Insert.aux03(74) [@l96,c14]
+	: List(0) [@l74,c11]
+List.Insert.new_elem(75) [@l94,c24]
+	: Element(0) [@l7,c15]
+List.Insert.ret_val(76) [@l95,c17]
+List.Print.aux01(77) [@l196,c14]
+	: List(0) [@l74,c11]
+List.Print.var_elem(78) [@l198,c18]
+	: Element(0) [@l7,c15]
+List.Print.var_end(79) [@l197,c17]
+List.Print.while_@l203,c9.GetAge$call@l204,c47(80) [@l204,c47]
+List.Print.while_@l203,c9.GetElem$call@l207,c37(81) [@l207,c37]
+	: Element(0) [@l7,c15]
+List.Print.while_@l203,c9.GetEnd$call@l206,c35(82) [@l206,c35]
+List.Print.while_@l203,c9.GetNext$call@l205,c34(83) [@l205,c34]
+	: List(0) [@l74,c11]
+List.Search.aux01(84) [@l160,c14]
+	: List(0) [@l74,c11]
+List.Search.e(85) [@l158,c23]
+	: Element(0) [@l7,c15]
+List.Search.int_ret_val(86) [@l159,c13]
+List.Search.nt(87) [@l163,c13]
+List.Search.var_elem(88) [@l161,c17]
+	: Element(0) [@l7,c15]
+List.Search.var_end(89) [@l162,c17]
+List.Search.while_@l169,c9.Equal$call@l170,c24(90) [@l170,c24]
+List.Search.while_@l169,c9.GetElem$call@l176,c37(91) [@l176,c37]
+	: Element(0) [@l7,c15]
+List.Search.while_@l169,c9.GetEnd$call@l175,c35(92) [@l175,c35]
+List.Search.while_@l169,c9.GetNext$call@l174,c34(93) [@l174,c34]
+	: List(0) [@l74,c11]
+List.SetNext.v_next(94) [@l106,c28]
+	: List(0) [@l74,c11]
+List.elem(95) [@l75,c5]
+	: Element(0) [@l7,c15]
+List.end(96) [@l77,c5]
+List.next(97) [@l76,c5]
+	: List(0) [@l74,c11]
+List.this(98) [java]
+	: List(0) [@l74,c11]
+== Fields ==
+== Heap Symbols ==
+new LL()(0) [@l3,c42]
+	: LL(0) [@l217,c9]
+new List()(1) [@l99,c27]
+	: List(0) [@l74,c11]
+new List()(2) [@l228,c31]
+	: List(0) [@l74,c11]
+new Element()(3) [@l235,c29]
+	: Element(0) [@l7,c15]
+new Element()(4) [@l241,c29]
+	: Element(0) [@l7,c15]
+new Element()(5) [@l248,c29]
+	: Element(0) [@l7,c15]
+new Element()(6) [@l252,c29]
+	: Element(0) [@l7,c15]
+new Element()(7) [@l258,c29]
+	: Element(0) [@l7,c15]
+== Relations: vP0 ==
+LL.this(50) = new LL()(0)
+List.this(98) = new List()(1)
+List.this(98) = new List()(2)
+Element.this(21) = new Element()(3)
+Element.this(21) = new Element()(4)
+Element.this(21) = new Element()(5)
+Element.this(21) = new Element()(6)
+Element.this(21) = new Element()(7)
+== Relations: assign ==
+Element.Age(0) = Element.Init.v_Age(16)
+Element.Salary(20) = Element.Init.v_Salary(18)
+Element.Married(19) = Element.Init.v_Married(17)
+Element.Equal.aux01(7) = Element.Equal.GetAge$call@l41,c29(6)
+Element.Equal.aux02(8) = Element.Equal.if_@l42,c9.GetSalary$call@l44,c36(10)
+List.end(96) = List.InitNew.v_end(70)
+List.elem(95) = List.InitNew.v_elem(69)
+List.next(97) = List.InitNew.v_next(71)
+List.Insert.aux03(74) = List.this(98)
+List.Insert.aux02(73) = List.this(98)
+List.Insert.ret_val(76) = List.Insert.InitNew$call@l100,c32(72)
+List.next(97) = List.SetNext.v_next(94)
+List.Delete.my_head(56) = List.this(98)
+List.Delete.aux01(52) = List.this(98)
+List.Delete.prev(58) = List.this(98)
+List.Delete.var_end(61) = List.end(96)
+List.Delete.var_elem(60) = List.elem(95)
+List.Delete.my_head(56) = List.Delete.while_@l131,c9.if_@l132,c13.if_@l134,c17.GetNext$call@l136,c44(63)
+List.Delete.aux05(54) = List.Delete.while_@l131,c9.if_@l132,c13.if_@l134,c17.SetNext$call@l140,c41(65)
+List.Delete.prev(58) = List.Delete.aux01(52)
+List.Delete.aux01(52) = List.Delete.while_@l131,c9.if_@l145,c13.GetNext$call@l147,c38(68)
+List.Delete.var_end(61) = List.Delete.while_@l131,c9.if_@l145,c13.GetEnd$call@l148,c39(67)
+List.Delete.var_elem(60) = List.Delete.while_@l131,c9.if_@l145,c13.GetElem$call@l149,c41(66)
+List.Search.aux01(84) = List.this(98)
+List.Search.var_end(89) = List.end(96)
+List.Search.var_elem(88) = List.elem(95)
+List.Search.aux01(84) = List.Search.while_@l169,c9.GetNext$call@l174,c34(93)
+List.Search.var_end(89) = List.Search.while_@l169,c9.GetEnd$call@l175,c35(92)
+List.Search.var_elem(88) = List.Search.while_@l169,c9.GetElem$call@l176,c37(91)
+List.Print.aux01(77) = List.this(98)
+List.Print.var_end(79) = List.end(96)
+List.Print.var_elem(78) = List.elem(95)
+List.Print.aux01(77) = List.Print.while_@l203,c9.GetNext$call@l205,c34(83)
+List.Print.var_end(79) = List.Print.while_@l203,c9.GetEnd$call@l206,c35(82)
+List.Print.var_elem(78) = List.Print.while_@l203,c9.GetElem$call@l207,c37(81)
+LL.Start.last_elem(49) = List.this(98)
+LL.Start.aux01(44) = LL.Start.Init$call@l229,c31(24)
+LL.Start.head(48) = LL.Start.last_elem(49)
+LL.Start.aux01(44) = LL.Start.Init$call@l231,c26(25)
+LL.Start.aux01(44) = LL.Start.Print$call@l232,c27(35)
+LL.Start.el01(45) = Element.this(21)
+LL.Start.aux01(44) = LL.Start.Init$call@l236,c26(26)
+LL.Start.head(48) = LL.Start.Insert$call@l237,c27(31)
+LL.Start.aux01(44) = LL.Start.Print$call@l238,c27(36)
+LL.Start.el01(45) = Element.this(21)
+LL.Start.aux01(44) = LL.Start.Init$call@l242,c26(27)
+LL.Start.el02(46) = LL.Start.el01(45)
+LL.Start.head(48) = LL.Start.Insert$call@l244,c27(32)
+LL.Start.aux01(44) = LL.Start.Print$call@l245,c27(37)
+LL.Start.el01(45) = Element.this(21)
+LL.Start.aux01(44) = LL.Start.Init$call@l249,c26(28)
+LL.Start.head(48) = LL.Start.Insert$call@l250,c27(33)
+LL.Start.aux01(44) = LL.Start.Print$call@l251,c27(38)
+LL.Start.el03(47) = Element.this(21)
+LL.Start.aux01(44) = LL.Start.Init$call@l253,c26(29)
+LL.Start.el01(45) = Element.this(21)
+LL.Start.aux01(44) = LL.Start.Init$call@l259,c26(30)
+LL.Start.head(48) = LL.Start.Insert$call@l260,c27(34)
+LL.Start.aux01(44) = LL.Start.Print$call@l261,c27(39)
+LL.Start.head(48) = LL.Start.Delete$call@l264,c27(22)
+LL.Start.aux01(44) = LL.Start.Print$call@l265,c27(40)
+LL.Start.head(48) = LL.Start.Delete$call@l269,c27(23)
+LL.Start.aux01(44) = LL.Start.Print$call@l270,c27(41)
+Element.Equal.GetAge$call@l41,c29(6) = Element.Age(0)
+Element.Equal.Compare$call@l42,c37(5) = Element.Compare.retval(4)
+Element.Compare.num1(2) = Element.Equal.aux01(7)
+Element.Compare.num2(3) = Element.Age(0)
+Element.Equal.if_@l42,c9.GetSalary$call@l44,c36(10) = Element.Salary(20)
+Element.Equal.if_@l42,c9.Compare$call@l45,c44(9) = Element.Compare.retval(4)
+Element.Compare.num1(2) = Element.Equal.aux02(8)
+Element.Compare.num2(3) = Element.Salary(20)
+Element.Equal.if_@l42,c9.if_@l45,c13.if_@l47,c17.GetMarried$call@l48,c44(11) = Element.Married(19)
+Element.Equal.if_@l42,c9.if_@l45,c13.if_@l47,c17.GetMarried$call@l51,c41(12) = Element.Married(19)
+List.InitNew.v_elem(69) = List.Insert.new_elem(75)
+List.InitNew.v_next(71) = List.Insert.aux03(74)
+List.Delete.while_@l131,c9.Equal$call@l132,c24(62) = Element.Equal.ret_val(15)
+Element.Equal.other(14) = List.Delete.var_elem(60)
+List.Delete.while_@l131,c9.if_@l132,c13.if_@l134,c17.GetNext$call@l136,c44(63) = List.next(97)
+List.Delete.while_@l131,c9.if_@l132,c13.if_@l134,c17.GetNext$call@l140,c55(64) = List.next(97)
+List.SetNext.v_next(94) = List.Delete.while_@l131,c9.if_@l132,c13.if_@l134,c17.GetNext$call@l140,c55(64)
+List.Delete.while_@l131,c9.if_@l145,c13.GetNext$call@l147,c38(68) = List.next(97)
+List.Delete.while_@l131,c9.if_@l145,c13.GetEnd$call@l148,c39(67) = List.end(96)
+List.Delete.while_@l131,c9.if_@l145,c13.GetElem$call@l149,c41(66) = List.elem(95)
+List.Search.while_@l169,c9.Equal$call@l170,c24(90) = Element.Equal.ret_val(15)
+Element.Equal.other(14) = List.Search.var_elem(88)
+List.Search.while_@l169,c9.GetNext$call@l174,c34(93) = List.next(97)
+List.Search.while_@l169,c9.GetEnd$call@l175,c35(92) = List.end(96)
+List.Search.while_@l169,c9.GetElem$call@l176,c37(91) = List.elem(95)
+List.Print.while_@l203,c9.GetAge$call@l204,c47(80) = Element.Age(0)
+List.Print.while_@l203,c9.GetNext$call@l205,c34(83) = List.next(97)
+List.Print.while_@l203,c9.GetEnd$call@l206,c35(82) = List.end(96)
+List.Print.while_@l203,c9.GetElem$call@l207,c37(81) = List.elem(95)
+LL.Start.Insert$call@l237,c27(31) = List.Insert.aux02(73)
+List.Insert.new_elem(75) = LL.Start.el01(45)
+LL.Start.Insert$call@l244,c27(32) = List.Insert.aux02(73)
+List.Insert.new_elem(75) = LL.Start.el01(45)
+LL.Start.Insert$call@l250,c27(33) = List.Insert.aux02(73)
+List.Insert.new_elem(75) = LL.Start.el01(45)
+LL.Start.Search$call@l254,c39(42) = List.Search.int_ret_val(86)
+List.Search.e(85) = LL.Start.el02(46)
+LL.Start.Search$call@l255,c39(43) = List.Search.int_ret_val(86)
+List.Search.e(85) = LL.Start.el03(47)
+LL.Start.Insert$call@l260,c27(34) = List.Insert.aux02(73)
+List.Insert.new_elem(75) = LL.Start.el01(45)
+LL.Start.Delete$call@l264,c27(22) = List.Delete.my_head(56)
+List.Delete.e(55) = LL.Start.el02(46)
+LL.Start.Delete$call@l269,c27(23) = List.Delete.my_head(56)
+List.Delete.e(55) = LL.Start.el01(45)

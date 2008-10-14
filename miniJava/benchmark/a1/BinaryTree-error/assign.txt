@@ -1,0 +1,6 @@
+	(dest=BBS.Init.sz(0) [@l75,c21](0),source=BBS.Start.sz(16) [@l18,c22](16))
+	(dest=BBS.size(18) [@l14,c5](18),source=BBS.Init.sz(0) [@l75,c21](0))
+	(dest=BBS.Start.aux01(15) [@l19,c13](15),source=BBS.Start.Print$call@l21,c27(12) [@l21,c27](12))
+	(dest=BBS.Start.aux01(15) [@l19,c13](15),source=BBS.Start.Sort$call@l23,c26(14) [@l23,c26](14))
+	(dest=BBS.Start.aux01(15) [@l19,c13](15),source=BBS.Start.Print$call@l24,c27(13) [@l24,c27](13))
+	(dest=BBS.Start.aux01(15) [@l19,c13](15),source=BBS.Start.Init$call@l20,c26(11) [@l20,c26](11))

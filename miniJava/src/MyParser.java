@@ -84,7 +84,7 @@ public class MyParser {
 	{
 		PrintStream f=new PrintStream( new FileOutputStream( file ) );
 		
-		int lines=1;
+		int lines=0;
 		for( Iterator<Symbols.General> i=list.iterator(); i.hasNext(); )
 		{
 			Symbols.General symb=i.next();

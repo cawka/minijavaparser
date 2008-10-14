@@ -1,0 +1,2 @@
+	(variable=BBS.number(17) [@l13,c5](17),heap=new int[](1) [@l77,c30](1))
+	(variable=BBS.this(19) [java](19),heap=new BBS()(0) [@l3,c43](0))

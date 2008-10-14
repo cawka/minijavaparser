@@ -1,0 +1,32 @@
+== Classes ==
+Fac(0) [@l7,c11]
+Fac2(0) [@l18,c20]
+	Fac(0) [@l7,c11]
+Fac3(0) [@l22,c20]
+	Fac2(0) [@l18,c20]
+		Fac(0) [@l7,c11]
+int[](0) [java]
+== Variables ==
+Fac.ComputeFac.if_@l10,c9.ComputeFac$call@l13,c45(0) [@l13,c45]
+Fac.ComputeFac.num(1) [@l8,c27]
+Fac.ComputeFac.num_aux(2) [@l9,c13]
+Fac.this(3) [java]
+	: Fac(0) [@l7,c11]
+Fac2.test(4) [@l19,c9]
+Fac2.this(5) [java]
+	: Fac2(0) [@l18,c20]
+	: 	Fac(0) [@l7,c11]
+Fac3.this(6) [java]
+	: Fac3(0) [@l22,c20]
+	: 	Fac2(0) [@l18,c20]
+	: 		Fac(0) [@l7,c11]
+Factorial.main.ComputeFac$call@l3,c48(7) [@l3,c48]
+== Fields ==
+== Heap Symbols ==
+new Fac()(0) [@l3,c48]
+	: Fac(0) [@l7,c11]
+== Relations: vP0 ==
+Fac.this(3) = new Fac()(0)
+== Relations: assign ==
+Factorial.main.ComputeFac$call@l3,c48(7) = Fac.ComputeFac.num_aux(2)
+Fac.ComputeFac.if_@l10,c9.ComputeFac$call@l13,c45(0) = Fac.ComputeFac.num_aux(2)

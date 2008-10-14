@@ -1,0 +1,4 @@
+	(variable=MyVisitor.this(0) [java](0),heap=new MyVisitor()(2) [@l32,c28](2))
+	(variable=TV.this(35) [java](35),heap=new TV()(0) [@l7,c42](0))
+	(variable=Tree.this(147) [java](147),heap=new Tree()(1) [@l19,c26](1))
+	(variable=Tree.this(147) [java](147),heap=new Tree()(3) [@l146,c30](3))

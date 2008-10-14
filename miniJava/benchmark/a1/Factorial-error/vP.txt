@@ -1,0 +1,1 @@
+	(variable=Fac.this(3) [java](3),heap=new Fac()(0) [@l3,c48](0))

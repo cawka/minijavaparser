@@ -1,0 +1,2 @@
+	(variable=QS.number(20) [@l13,c5](20),heap=new int[](1) [@l96,c30](1))
+	(variable=QS.this(22) [java](22),heap=new QS()(0) [@l3,c42](0))

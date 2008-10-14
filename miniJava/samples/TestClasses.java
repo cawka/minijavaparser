@@ -7,21 +7,22 @@ class TestClasses {
 
 class Medved extends Preved
 {
-	int test;
-	
 	public int begin()
 	{
-		Belka test;
-		
 		preved=new Belka();
-		test=preved.test( );
+		preved=this.test( );
 		return 0;
 	}
 }
 
 class Preved
 {
-	Belka preved;
+	Krot preved;
+
+	public Krot test()
+	{
+		return new Krot();
+	}
 }
 
 class Belka extends Krot
@@ -30,8 +31,4 @@ class Belka extends Krot
 
 class Krot
 {
-	public Preved test()
-	{
-		return new Medved();
-	}
 }

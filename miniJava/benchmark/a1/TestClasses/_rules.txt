@@ -1,0 +1,45 @@
+== Classes ==
+Belka(0) [@l28,c21]
+	Krot(0) [@l33,c1]
+Krot(0) [@l33,c1]
+Medved(0) [@l8,c22]
+	Preved(0) [@l19,c1]
+Preved(0) [@l19,c1]
+int[](0) [java]
+== Variables ==
+Belka.this(0) [java]
+	: Belka(0) [@l28,c21]
+	: 	Krot(0) [@l33,c1]
+Krot.this(1) [java]
+	: Krot(0) [@l33,c1]
+Medved.begin.preved(2) [tmp_var]
+	: Krot(0) [@l33,c1]
+Medved.begin.test$call@l13,c33(3) [@l13,c33]
+	: Krot(0) [@l33,c1]
+Medved.this(4) [java]
+	: Medved(0) [@l8,c22]
+	: 	Preved(0) [@l19,c1]
+Preved.preved(5) [@l20,c9]
+	: Krot(0) [@l33,c1]
+Preved.this(6) [java]
+	: Preved(0) [@l19,c1]
+TestClasses.main.begin$call@l4,c55(7) [@l4,c55]
+== Fields ==
+== Heap Symbols ==
+new Medved()(0) [@l4,c55]
+	: Medved(0) [@l8,c22]
+	: 	Preved(0) [@l19,c1]
+new Belka()(1) [@l12,c35]
+	: Belka(0) [@l28,c21]
+	: 	Krot(0) [@l33,c1]
+new Krot()(2) [@l24,c34]
+	: Krot(0) [@l33,c1]
+== Relations: vP0 ==
+Medved.this(4) = new Medved()(0)
+Belka.this(0) = new Belka()(1)
+Krot.this(1) = new Krot()(2)
+== Relations: assign ==
+Medved.begin.preved(2) = Belka.this(0)
+Medved.begin.preved(2) = Medved.begin.test$call@l13,c33(3)
+Preved.preved(5) = Medved.begin.preved(2)
+Medved.begin.test$call@l13,c33(3) = Krot.this(1)

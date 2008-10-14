@@ -1,0 +1,4 @@
+	(dest=Medved.begin.preved(2) [tmp_var](2),source=Belka.this(0) [java](0))
+	(dest=Medved.begin.preved(2) [tmp_var](2),source=Medved.begin.test$call@l13,c33(3) [@l13,c33](3))
+	(dest=Preved.preved(5) [@l20,c9](5),source=Medved.begin.preved(2) [tmp_var](2))
+	(dest=Medved.begin.test$call@l13,c33(3) [@l13,c33](3),source=Krot.this(1) [java](1))

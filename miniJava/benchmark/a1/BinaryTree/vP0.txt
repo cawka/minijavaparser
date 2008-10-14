@@ -1,0 +1,3 @@
+	(variable=Tree.this(132) [java](132),heap=new Tree()(2) [@l131,c30](2))
+	(variable=Tree.this(132) [java](132),heap=new Tree()(1) [@l17,c26](1))
+	(variable=BT.this(22) [java](22),heap=new BT()(0) [@l3,c42](0))
