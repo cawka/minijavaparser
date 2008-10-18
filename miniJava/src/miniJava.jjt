@@ -157,6 +157,7 @@ void ClassDeclaration() :
 	SymbId s_id;
 	Symbols.Variable var;
 	Symbols.Function func;
+	Symbols.Variable future_this;
 }
 {
 	"class" t=Identifier()
@@ -164,13 +165,25 @@ void ClassDeclaration() :
 		s_id=new SymbId( t.image );
 		c=new Symbols.Class( s_id, "", jjtThis.pos(jj_input_stream), null );
 
-		if( jjtThis._symbols.get(new SymbId( s_id,"this" ))==null )
-			jjtThis._symbols.put( new SymbId(s_id,"this"), new Symbols.Variable(new SymbId(s_id,"this"), t.image,"","java") );
+		future_this=jjtThis._symbols.get(new SymbId( s_id,"this" ));
+		if( future_this==null )
+		{
+			future_this=new Symbols.Variable( new SymbId(s_id,"this"), t.image,"","java" );
+			jjtThis._symbols.put( new SymbId(s_id,"this"), future_this );
+		}
 		jjtThis._types.put( s_id, c );
 	} 
   	"{" 
-  		( var =VarDeclaration   (s_id) {c._variables.put(var ._name.getName(),var);} )* 
-        ( func=MethodDeclaration(s_id) {c._methods  .put(func._name.getName(),func); })*
+//  		( var =VarDeclaration   (s_id) {c._variables.put(var ._name.getName(),var);} )* 
+//        ( func=MethodDeclaration(s_id) {c._methods  .put(func._name.getName(),func); })*
+  		( var =VarDeclaration   (s_id) {c._variables.put(var. _name.getName(),var);} )* 
+        ( 
+        	func=MethodDeclaration(s_id) 
+        {
+        	func._this=future_this;
+        	c._methods  .put(func._name.getName(),func); 
+        }
+        )*
     "}"
 }
 
@@ -184,6 +197,7 @@ void ClassExtendsDeclaration() :
 	SymbId s_id;
 	Symbols.Variable var;
 	Symbols.Function func;
+	Symbols.Variable future_this;
 }
 {
   "class" t=Identifier() "extends" parentClass=Identifier()
@@ -192,14 +206,24 @@ void ClassExtendsDeclaration() :
   		
   		c=new Symbols.Class( s_id, "",jjtThis.pos(jj_input_stream), parentClass.image );
 		
-		if( jjtThis._symbols.get(new SymbId( s_id,"this" ))==null )
-			jjtThis._symbols.put( new SymbId(s_id,"this"), new Symbols.Variable(new SymbId(s_id,"this"), t.image,"","java") );
+		future_this=jjtThis._symbols.get(new SymbId( s_id,"this" ));
+		if( future_this==null )
+		{
+			future_this=new Symbols.Variable( new SymbId(s_id,"this"), t.image,"","java" );
+			jjtThis._symbols.put( new SymbId(s_id,"this"), future_this );
+		}
   		jjtThis._types.put( s_id, c );
   }
   
    "{" 
   		( var =VarDeclaration   (s_id) {c._variables.put(var. _name.getName(),var);} )* 
-        ( func=MethodDeclaration(s_id) {c._methods  .put(func._name.getName(),func); })*
+        ( 
+        	func=MethodDeclaration(s_id) 
+        {
+        	func._this=future_this;
+        	c._methods  .put(func._name.getName(),func); 
+        }
+        )*
   "}"
 }
 
@@ -234,8 +258,11 @@ Symbols.Function MethodDeclaration( SymbId path )  :
   "public" type=Type() t=Identifier() 
   {
   		s_id=new SymbId( path,t.image );
+  		jjtThis._name=s_id;
 		func=new Symbols.Function( s_id,type,"",pos );
-  }
+  		jjtThis._methods.put( s_id, func );
+ 		if( jjtThis._call_graph._all_nodes.get(t.image)==null ) jjtThis._call_graph._all_nodes.put( t.image, new CallGraph.Node(t.image) );
+   }
   
   "(" ( func._variables=FormalParameterList( s_id ) )? ")"   
   
@@ -244,7 +271,7 @@ Symbols.Function MethodDeclaration( SymbId path )  :
       
    {
    		func._return=ret;
-   		jjtThis._methods.put( s_id, func );
+   		if( ret!=null ) jjtThis._return.add( new Relations.ReturnWithType(func,ret) );
    		return func;
    }
 }
@@ -390,9 +417,9 @@ void AssignmentStatement(SymbId scope)  :
 		}
 		
 		if( right instanceof Symbols.Heap )
-			jjtThis._vP0.add( new Relations.vP(left,right) );
+			jjtThis._vP0.add( new Relations.TwoSymbols(left,right) );
 		else
-			jjtThis._assign.add( new Relations.vP(left,right) );
+			jjtThis._assign.add( new Relations.TwoSymbols(left,right) );
   }
 }
 
@@ -518,6 +545,8 @@ Symbols.Variable MessageSend(SymbId scope)  :
 	Token t;
 	Vector<Symbols.Variable> actual_params=new Vector<Symbols.Variable>();
 	String pos;
+	Symbols.Function invocation_method;
+	Symbols.Call call;
 }
 {
 	{ pos=jjtThis.pos(jj_input_stream); }
@@ -526,12 +555,28 @@ Symbols.Variable MessageSend(SymbId scope)  :
 	  "(" ( actual_params=ExpressionList(scope) )? ")"
 
   {
+  		if( jjtThis._call_graph._all_nodes.get(t.image)==null ) jjtThis._call_graph._all_nodes.put( t.image, new CallGraph.Node(t.image) );
+  
   		if( var==null ) throw new Error( "Method call on non-class variable ["+pos+"]" );
+  		invocation_method=jjtThis._methods.get( scope.getScopeLevel(2) );
+  		if( invocation_method==null )
+  		{
+  			invocation_method=jjtThis._methods.get( new SymbId("STATIC") );
+  			if( invocation_method==null ) throw new Error( "STATIC method should be inserted into _methods map before parsing" );
+  		}
 		
 		Symbols.ReturnVariable ret=new Symbols.ReturnVariable( new SymbId(scope,t.image+"$call"+pos),"",pos );
-   		jjtThis._calls.add( new Symbols.Call(var, t.image, actual_params, "", pos, ret) );
+		call=new Symbols.Call(var, t.image, actual_params, "", pos, ret,invocation_method);
+   		jjtThis._calls.add( call );
 		
 		jjtThis._symbols.put( ret._name, ret );
+
+  		jjtThis._mI.add( new Relations.mI(invocation_method,call,t.image) );
+  		jjtThis._callreturn.add( new Relations.TwoSymbols(call,ret) );
+
+		String callee=invocation_method._name.getName();
+		if( !callee.equals(t.image) ) jjtThis._call_graph._all_nodes.get( callee ).addEdge( invocation_method, call, t.image );
+
 		return ret;
   }
 }

@@ -1,0 +1,39 @@
+.basedir "testing"
+#.bddvarorder V1_V0_H1
+
+##############################################
+# MAPS
+##############################################
+V	65535	V.map
+H	65535	H.map
+T	65535	T.map
+
+##############################################
+#RELATIONS
+##############################################
+
+#input
+vP0	(variable:V, heap:H) inputtuples printtuples
+assign	(dest:V, source:V) inputtuples printtuples
+vT (variable:V, type:T) inputtuples printtuples
+hT (heap:H, type:T) inputtuples printtuples
+aT0 (supertype:T, subtype:T) inputtuples printtuples 
+
+#output
+vP	(variable:V,heap:H)		output outputtuples printtuples
+aT	(supertype:T, subtype:T)	output outputtuples printtuples
+
+#temporary
+vPfilter (variable:V,heap:H)
+
+##############################################
+#RULES
+##############################################
+#aT(t,t) :- TRUE.
+aT(t1,t2) :- aT0(t1,t2).
+aT(t1,t2) :- aT(t1,t),aT(t,t2).
+
+vPfilter(v,h) :- vT(v,t_v),hT(h,t_h),aT(t_v,t_h).
+
+vP(v,h) :- vP0(v,h).
+vP(v1,h) :- assign(v1,v2),vP(v2,h),vPfilter(v1,h).

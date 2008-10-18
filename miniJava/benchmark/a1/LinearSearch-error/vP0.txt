@@ -1,2 +1,0 @@
-	(variable=LS.this(24) [java](24),heap=new LS()(0) [@l3,c42](0))
-	(variable=LS.number(22) [@l12,c5](22),heap=new int[](1) [@l85,c30](1))

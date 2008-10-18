@@ -47,6 +47,18 @@ public class SymbId
 		return ret;
 	}
 	
+	public SymbId getScopeLevel( int level )
+	{
+		assert( level>=1 );
+		assert( _scope.size()>=level );
+		
+		int i=0;
+		SymbId ret=new SymbId( _scope.get(i++) );
+		
+		for( ; i<level; i++ ) ret._scope.add( _scope.get(i) );
+		return ret;
+	}
+	
 	static public List<String> newScope( final List<String> scope, final String add )
 	{
 		List<String> list=new LinkedList<String>(scope);

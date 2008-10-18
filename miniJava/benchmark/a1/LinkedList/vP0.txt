@@ -1,8 +1,0 @@
-	(variable=List.this(98) [java](98),heap=new List()(2) [@l228,c31](2))
-	(variable=List.this(98) [java](98),heap=new List()(1) [@l99,c27](1))
-	(variable=LL.this(50) [java](50),heap=new LL()(0) [@l3,c42](0))
-	(variable=Element.this(21) [java](21),heap=new Element()(4) [@l241,c29](4))
-	(variable=Element.this(21) [java](21),heap=new Element()(6) [@l252,c29](6))
-	(variable=Element.this(21) [java](21),heap=new Element()(5) [@l248,c29](5))
-	(variable=Element.this(21) [java](21),heap=new Element()(3) [@l235,c29](3))
-	(variable=Element.this(21) [java](21),heap=new Element()(7) [@l258,c29](7))

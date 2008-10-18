@@ -5,3 +5,15 @@ miniJava/testing
 *.bdd
 *.a1
 *.a1.datalog
+*.a2
+*.a2.datalog
+*.a3
+*.a3.datalog
+*.a4
+*.a4.datalog
+*.a5
+*.a5.datalog
+*.a6
+*.a6.datalog
+*.class
+miniJava/benchmark/

@@ -1,8 +1,0 @@
-	(variable=Belka.this(0) [java](0),heap=new Belka()(1) [@l12,c35](1))
-	(variable=Medved.this(4) [java](4),heap=new Medved()(0) [@l4,c55](0))
-	(variable=Medved.begin.preved(2) [tmp_var](2),heap=new Krot()(2) [@l24,c34](2))
-	(variable=Medved.begin.preved(2) [tmp_var](2),heap=new Belka()(1) [@l12,c35](1))
-	(variable=Krot.this(1) [java](1),heap=new Krot()(2) [@l24,c34](2))
-	(variable=Preved.preved(5) [@l20,c9](5),heap=new Krot()(2) [@l24,c34](2))
-	(variable=Preved.preved(5) [@l20,c9](5),heap=new Belka()(1) [@l12,c35](1))
-	(variable=Medved.begin.test$call@l13,c33(3) [@l13,c33](3),heap=new Krot()(2) [@l24,c34](2))

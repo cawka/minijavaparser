@@ -1,4 +1,0 @@
-	(variable=LS.Start.test(22) [@l17,c28](22),heap=new Test()(1) [@l3,c56](1))
-	(variable=LS.this(25) [java](25),heap=new LS()(0) [@l3,c42](0))
-	(variable=Test.this(27) [java](27),heap=new Test()(1) [@l3,c56](1))
-	(variable=LS.number(23) [@l12,c5](23),heap=new int[](2) [@l85,c30](2))

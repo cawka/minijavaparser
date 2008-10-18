@@ -217,6 +217,8 @@ class Tree{
 	    if (c_node.GetHas_Right())
 		ntb = this.RemoveRight(p_node,c_node) ;
 	    else {
+	    	ntb=this.Delete( 3 );
+
 		auxkey1 = c_node.GetKey();
 		//auxtree01 = p_node.GetLeft() ;
 		//auxkey2 = auxtree01.GetKey() ;

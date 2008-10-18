@@ -1,0 +1,70 @@
+.basedir "testing"
+
+##############################################
+# MAPS
+##############################################
+V	65535	V.map
+H	65535	H.map
+T	65535	T.map
+I	65535	I.map
+N	65535	N.map
+M	65535	M.map
+Z	65535
+C	65535
+
+##############################################
+#RELATIONS
+##############################################
+
+#input
+vP0	(variable:V, heap:H) inputtuples printtuples
+assign  (dest:V, source:V) inputtuples
+vT (variable:V, type:T) inputtuples printtuples
+hT (heap:H, type:T) inputtuples printtuples
+aT0 (supertype:T, subtype:T) inputtuples printtuples 
+
+cha (type:T, target:M, name:N) inputtuples printtuples
+actual (invoke:I, param:Z, var:V) inputtuples printtuples
+formal (method:M, param:Z, var:V) inputtuples printtuples
+mIc (method:M, caller:C, invoke:I, callee:C, name:N) inputtuples printtuples
+return (method:M, variable:V, type:T) inputtuples printtuples
+callreturn (invocation:I, variable:V) inputtuples printtuples
+
+#output
+#vP  (variable:V,heap:H)					 printtuples
+vP	(context:C,variable:V,heap:H)		 printtuples
+aT	(supertype:T, subtype:T)	    printtuples
+IEc	(caller:C,invocation:I, callee:C,method:M)	printtuples
+assign2 (dest_c:C,dest:V,src_c:C,src:V)	output printtuples
+
+#temporary
+vPfilter (variable:V,heap:H)
+chaVirtual (type:T, target:M, name:N) printtuples
+chaFilter(type:T, name:N) printtuples
+chaReal (type:T, target:M, name:N) printtuples
+
+##############################################
+#RULES
+##############################################
+aT(t1,t2) :- aT0(t1,t2).
+aT(t1,t2) :- aT(t1,t),aT(t,t2).
+
+vPfilter(v,h) :- vT(v,t_v),hT(h,t_h),aT(t_v,t_h).
+
+assign2(_,v1,_,v2) :- assign(v1,v2).
+
+vP(_,v,h) :- vP0(v,h).
+vP(c,v1,h) :- assign2(c,v1,c2,v2),vP(c2,v2,h),vPfilter(v1,h).
+
+# to make sure, that return value of the right method will be delivered to the right place
+assign2(c1,v1,c2,v2) :- IEc(c2,i,c1,m),callreturn(i,v1),return(m,v2,_).
+# Propagate type for temporary call variable
+vT(v,t) :- IEc(_,i,_,m),callreturn(i,v),return(m,_,t).
+
+IEc(c1,i,c2,m) :- mIc(_,c1,i,c2,name),chaReal(type,m,name),actual(i,0,this),vP(c1,this,h),hT(h,type).
+#assign2(c1,v1,c2,v2) :- IEc(c1,i,c2,m),actual(i,z,v2),formal(m,z,v1).
+
+# Make smaller sets using virtual function assumption
+chaFilter(type,name) :- cha(type,_,name).
+chaVirtual(type,m,name) :- cha(t,m,name),aT(t,type),aT(t,subclass),aT(subclass,type),chaFilter(subclass,name),!aT(type,t),!aT(subclass,t).
+chaReal(type,m,name) :- cha(t,m,name),aT(t,type),!chaVirtual(type,m,name).

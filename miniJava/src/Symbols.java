@@ -33,7 +33,9 @@ public class Symbols {
 		public void resolveForwardDeclarations( MyNode n ) { }
 	}
 	
-	public static class Variable extends General {
+	public static class Variable extends General 
+		implements PrintRelation
+	{
 		public Variable( SymbId name, String type, String file, String line ) { 
 			super( name,file,line );
 			_type_s=type;
@@ -57,6 +59,12 @@ public class Symbols {
 			else
 				_type.dump( prefix+"\t: ");
 		}
+		
+		public String toRelation( ) throws NoRelation
+		{
+			if( _type==null ) throw new NoRelation();
+			return _name._line+" "+_type._name._line;
+		}
 	};
 	
 	public static class Heap extends Variable 
@@ -73,7 +81,7 @@ public class Symbols {
 			Symbols.Variable var_this=n.variableLookup( "this", new SymbId(_type_s) );
 			if( var_this==this ) return;
 			
-			Relations.vP vP0=new Relations.vP(var_this,this);// var_this,this );
+			Relations.TwoSymbols vP0=new Relations.TwoSymbols(var_this,this);// var_this,this );
 			n._vP0.add( vP0 );
 		}
 	}
@@ -111,7 +119,7 @@ public class Symbols {
 			if( var==null ) throw new Error( "Undeclared variable "+this );
 			
 			_type=var._type;
-			n._assign.add( new Relations.vP(var,this) );
+			n._assign.add( new Relations.TwoSymbols(var,this) );
 		}		
 	}
 
@@ -130,6 +138,7 @@ public class Symbols {
 		public Symbols.Class _type;
 		public String _type_s;
 		public Variable _return;
+		public Variable _this;
 
 		public Vector<Variable> _variables=new Vector<Variable>();
 		public int _invocations=0;
@@ -143,11 +152,13 @@ public class Symbols {
 
 		public void dump( String prefix ) {
 			super.dump( prefix );
-			_type.dump( prefix+"\t: ");
+			if( _type!=null ) _type.dump( prefix+"\t: ");
 		}
 	}
 	
-	public static class Class extends General {
+	public static class Class extends General
+		implements PrintRelation
+	{
 		public Class( SymbId name, String file, String line, String parent ) {
 			super( name, file, line );
 			_parent_s=parent;
@@ -193,6 +204,13 @@ public class Symbols {
 			if( ret==null ) throw new Error( "Unknown class variable "+this._name+"::"+name );
 			return ret;
 		}
+		
+		public String toRelation( ) throws NoRelation
+		{
+			String ret=_name._line+" "+_name._line;
+			if( _parent!=null ) ret+="\n"+_parent._name._line+" "+_name._line;
+			return ret;
+		}
 
 		/**
 		 * + function list
@@ -207,35 +225,68 @@ public class Symbols {
 	
 	public static class Call extends General 
 	{
-		public Call( Variable variable, String method, Vector<Variable> params, String file, String line, ReturnVariable retvar )
+		public Call( Variable variable, String method, Vector<Variable> params, 
+				    String file, String line, ReturnVariable retvar, Function invoke_method )
 		{
 			super( new SymbId(variable._name,method),file,line );
 			_variable=variable;
 			_method=method;
 			_params=params;
 			_retvar=retvar;
+			_invoke_method=invoke_method;
+		}
+		
+		public boolean checkMethod( Function invoke )
+		{
+			if( invoke._variables.size()!=_params.size() ) return false;
+//			if( invoke._return._type    !=_retvar._type )  return false;
+			
+//			Iterator<Variable> actual=_params.iterator( );
+//			Iterator<Variable> formal=invoke._variables.iterator();
+//			for( ; actual.hasNext() && formal.hasNext(); ) if( actual.next()._type!=formal.next()._type ) return false;
+			
+			return true;
 		}
 
 		public void resolveForwardDeclarations( MyNode n ) 
 		{
 			try
 			{
-				if( _variable._type==null ) throw new Error( "Method call for non-class variable" );
+				if( MyParser._algorithm.compareTo("a3")<0 &&
+				    _variable._type==null ) throw new Error( "Method call for non-class variable" );
 				
-				Function func=_variable._type.lookupMethod( _method );
-				if( func._variables.size()!=_params.size() ) throw new Error( "Formal and actual parameters mistmatch for method "+_method+" call" );
-
-				_retvar._type=func._type;
-				if( func._return!=null ) n._assign.add( new Relations.vP(_retvar,func._return) );
+				/////////////////////////////////////////////////////
+				// DEEPLY INCORRECT SOLUTION - do not allow virtual calls !!!
+				//Function func=_variable._type.lookupMethod( _method );
+				/////////////////////////////////////////////////////
+				//
+				// For our analysis part we should find all methods with name '_method' and having 
+				// right formal parameters. For all these methods we should add temporary variable assignments
+				// 
 				
-				Iterator<Variable> formal=func._variables.iterator( );
-				Iterator<Variable> actual=_params.iterator( );
-				for( int i=0; i<_params.size(); i++ )
+				// in a3 and later algorithms everything will be done by bddbddb analysis
+				if( MyParser._algorithm.compareTo("a3")<0 )
 				{
-					Variable a=actual.next();
-					Variable f=formal.next();
-					if( a==null ) continue; //formal parameter can't be null
-					n._assign.add( new Relations.vP(f,a) );
+					Vector<Function> list=n.getMethodsByName( _method ); // let's assume we can make call for every method (do not check type)
+					if( list.size()==0 ) throw new Error( "No matching functions found for method call "+_method+" call"+" ["+_line+"]" );
+	
+					for( Iterator<Function> iter=list.iterator(); iter.hasNext(); )
+					{
+						Function func=iter.next( );
+						if( !checkMethod(func) ) continue;
+						_retvar._type=func._type;
+						if( func._return!=null ) n._assign.add( new Relations.TwoSymbols(_retvar,func._return) );
+						
+						Iterator<Variable> formal=func._variables.iterator( );
+						Iterator<Variable> actual=_params.iterator( );
+						for( int i=0; i<_params.size(); i++ )
+						{
+							Variable a=actual.next();
+							Variable f=formal.next();
+							if( a==null ) continue; //formal parameter can't be null
+							n._assign.add( new Relations.TwoSymbols(f,a) );
+						}
+					}
 				}
 			}
 			catch( Error e )
@@ -248,6 +299,7 @@ public class Symbols {
 		public String 			_method;
 		public Vector<Variable> _params;
 		public ReturnVariable 	_retvar;
+		public Function			_invoke_method;
 	}
 	
 	class ClassNotFoundException extends Error {}
