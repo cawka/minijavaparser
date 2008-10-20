@@ -54,8 +54,8 @@ datalog:
 	java -jar ../bdd.jar $@ > ../benchmark/a4/$(@:.a4.datalog=)/_bdd.log
 
 %.a4.pdf:
-	dot -Tpdf -o $@ ../benchmark/a4/$(@:.a4.pdf=)/call_graph.dot
-	dot -Tpdf -o $(@:.pdf=.classes.pdf) ../benchmark/a4/$(@:.a4.pdf=)/class_diagram.dot
+	dot -Tpdf -o $(@:.a4.pdf=_ad.pdf) ../benchmark/a4/$(@:.a4.pdf=)/call_graph.dot
+	dot -Tpdf -o $(@:.a4.pdf=_a4_classes.pdf) ../benchmark/a4/$(@:.a4.pdf=)/class_diagram.dot
 
 clean:
 	rm *.a1

@@ -17,9 +17,9 @@ class Bear extends Animal
 		dinner=new Hummingbird( );
 		still_hungry=!this.chew( dinner );
 		
-		///////////////////////  //a1: [[bird]]=={new Hummingbird,new Bird}
+		////////////
 		bird=dinner;
-		///////////////////////  //a2: [[bird]]=={new Hummingbird}
+		////////////
 		
 		while( still_hungry ) //let's assume, that new can sometimes return NULL.
 		{
