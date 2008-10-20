@@ -398,7 +398,7 @@ import java.util.Vector;
      jjtree.closeNodeScope(jjtn000, true);
      jjtc000 = false;
                 func._return=ret;
-                if( ret!=null ) jjtn000._return.add( new Relations.ReturnWithType(func,ret) );
+                if( ret!=null ) jjtn000._return.add( new Relations.TwoSymbols(func,ret) );
                 {if (true) return func;}
     } catch (Throwable jjte000) {
     if (jjtc000) {
