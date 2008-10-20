@@ -31,8 +31,8 @@ return (method:M, variable:V, type:T) inputtuples printtuples
 callreturn (invocation:I, variable:V) inputtuples printtuples
 
 #output
-#vP  (variable:V,heap:H)					 printtuples
-vP	(context:C,variable:V,heap:H)		 printtuples
+vP  (variable:V,heap:H)					 printtuples
+vPc	(context:C,variable:V,heap:H)		 printtuples
 aT	(supertype:T, subtype:T)	    printtuples
 IEc	(caller:C,invocation:I, callee:C,method:M)	printtuples
 assign2 (dest_c:C,dest:V,src_c:C,src:V)	output printtuples
@@ -51,18 +51,25 @@ aT(t1,t2) :- aT(t1,t),aT(t,t2).
 
 vPfilter(v,h) :- vT(v,t_v),hT(h,t_h),aT(t_v,t_h).
 
-assign2(_,v1,_,v2) :- assign(v1,v2).
+assign2(c1,v1,c2,v2) :- mIc(_,c1,_,_,_),mIc(_,_,_,c2,_),assign(v1,v2).
+#assign2(c1,v1,c2,v2) :- mIc(_,c1,_,_,_),mIc(_,c2,_,_,_),assign(v1,v2).
+#assign2(c1,v1,c2,v2) :- mIc(_,_,_,c1,_),mIc(_,_,_,c2,_),assign(v1,v2).
+#assign2(c1,v1,c2,v2) :- mIc(_,_,_,c1,_),mIc(_,_,_,c2,_),assign(v1,v2).
+#assign2(c,v1,c,v2) :- mIc(_,_,_,c,_),assign(v1,v2).
 
-vP(_,v,h) :- vP0(v,h).
-vP(c,v1,h) :- assign2(c,v1,c2,v2),vP(c2,v2,h),vPfilter(v1,h).
+vPc(c,v,h) :- mIc(_,c,_,_,_),vP0(v,h).
+vPc(c,v,h) :- mIc(_,_,_,c,_),vP0(v,h).
+vPc(c,v1,h) :- assign2(c,v1,c2,v2),vPc(c2,v2,h),vPfilter(v1,h).
+
+vP(v,h) :- vPc(_,v,h).
 
 # to make sure, that return value of the right method will be delivered to the right place
-assign2(c1,v1,c2,v2) :- IEc(c2,i,c1,m),callreturn(i,v1),return(m,v2,_).
+assign2(c1,v1,c2,v2) :- IEc(c1,i,c2,m),callreturn(i,v1),return(m,v2,_).
 # Propagate type for temporary call variable
 vT(v,t) :- IEc(_,i,_,m),callreturn(i,v),return(m,_,t).
 
-IEc(c1,i,c2,m) :- mIc(_,c1,i,c2,name),chaReal(type,m,name),actual(i,0,this),vP(c1,this,h),hT(h,type).
-#assign2(c1,v1,c2,v2) :- IEc(c1,i,c2,m),actual(i,z,v2),formal(m,z,v1).
+IEc(c1,i,c2,m) :- mIc(_,c1,i,c2,name),chaReal(type,m,name),actual(i,0,this),vPc(c1,this,h),hT(h,type).
+assign2(c1,v1,c2,v2) :- IEc(c2,i,c1,m),actual(i,z,v2),formal(m,z,v1).
 
 # Make smaller sets using virtual function assumption
 chaFilter(type,name) :- cha(type,_,name).

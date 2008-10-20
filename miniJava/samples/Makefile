@@ -1,16 +1,17 @@
-SOURCES=BinaryTree-error.java   Factorial.java                         TestClasses.java \
-BinaryTree.java         LinearSearch-error.java  \
-LinearSearch.java       MoreThan4.java          TreeVisitor.java \
-BubbleSort.java         LinkedList-error.java   QuickSort-error.java	\
-Factorial-error.java    LinkedList.java         QuickSort.java	\
+SOURCES=Factorial.java  TestClasses.java TestContexts.java \
+BinaryTree.java         LinearSearch.java       MoreThan4.java          TreeVisitor.java \
+BubbleSort.java         LinkedList-error.java   \
+LinkedList.java         QuickSort.java
 
-all: a4 a5 a6
+all: a1 a2 a3 a4
 
 a1: $(SOURCES:.java=.a1) $(SOURCES:.java=.a1.datalog)
 
 a2: $(SOURCES:.java=.a2) $(SOURCES:.java=.a2.datalog)
 
 a3: $(SOURCES:.java=.a3) $(SOURCES:.java=.a3.datalog)
+
+a4: $(SOURCES:.java=.a4) $(SOURCES:.java=.a4.datalog) $(SOURCES:.java=.a4.pdf)
 
 datalog:
 	rm *.a1.datalog
@@ -43,11 +44,26 @@ datalog:
 	awk -v basedir=../benchmark/a3/$(@:.a3.datalog=) -f ../rebase-datalog.awk ../a3.datalog > $@
 	java -jar ../bdd.jar $@ > ../benchmark/a3/$(@:.a3.datalog=)/_bdd.log
 
+%.a4: %.java
+	mkdir -p ../benchmark/a4/$(@:.a4=)
+	java -jar ../parser.jar ../benchmark/a4/$(@:.a4=) $(@:.a4=.java) a4 > ../benchmark/a4/$(@:.a4=)/_rules.txt
+	cp ../benchmark/a4/$(@:.a4=)/_rules.txt $@
+
+%.a4.datalog: ../a4.datalog
+	awk -v basedir=../benchmark/a4/$(@:.a4.datalog=) -f ../rebase-datalog.awk ../a4.datalog > $@
+	java -jar ../bdd.jar $@ > ../benchmark/a4/$(@:.a4.datalog=)/_bdd.log
+
+%.a4.pdf:
+	dot -Tpdf -o $@ ../benchmark/a4/$(@:.a4.pdf=)/call_graph.dot
+
 clean:
-#	rm *.a1
-#	rm *.a1.datalog
-#	rm *.a2
-#	rm *.a2.datalog
-#	rm *.a3
-#	rm *.a3.datalog
+	rm *.a1
+	rm *.a1.datalog
+	rm *.a2
+	rm *.a2.datalog
+	rm *.a3
+	rm *.a3.datalog
+	rm *.a4
+	rm *.a4.datalog
+
 

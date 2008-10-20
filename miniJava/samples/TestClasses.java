@@ -2,45 +2,8 @@ class TestClasses {
 	public static void main( String[] preved )
 	{
 		System.out.println( new Bear().eat() );
-//		System.out.println( new G().m() );
 	}
 }
-//
-//class A {
-//}
-//
-//class B extends A {
-//	public int m( )
-//	{
-//		return 1;
-//	}
-//}
-//
-//class C extends B {
-//	public int m( )
-//	{
-//		return 1;
-//	}
-//}
-//
-//class D extends C {
-//	
-//}
-//
-//class E extends D {
-//	public int m()
-//	{
-//		return 1;
-//	}
-//}
-//
-//class F extends E {
-//	
-//}
-//
-//class G extends F {
-//
-//}
 
 class Bear extends Animal
 {
@@ -118,7 +81,6 @@ class Dinosaur extends Bird
 		return new Bear( );
 	}
 }
-
 
 class Bird extends Food
 {

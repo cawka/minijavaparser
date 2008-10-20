@@ -211,6 +211,12 @@ public class Symbols {
 			if( _parent!=null ) ret+="\n"+_parent._name._line+" "+_name._line;
 			return ret;
 		}
+		
+		public String toRelationDot() throws NoRelation {
+			String ret="";
+			if( _parent!=null ) ret+=_parent._name.getName()+" -> "+_name.getName();
+			return ret;
+		}
 
 		/**
 		 * + function list

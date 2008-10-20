@@ -148,6 +148,9 @@ public class MyParser {
 
 		File call_graph=new File( dir+"/call_graph.dot" );
 		node._call_graph.dumpGraph( new PrintStream(new FileOutputStream(call_graph)) );
+		
+		File class_diagram=new File( dir+"/class_diagram.dot" );
+		exportDotGraph( node._types.values(), class_diagram );
 	}
 	
 	public static void exportMapToFile( Collection list, File file ) throws FileNotFoundException
@@ -327,5 +330,19 @@ public class MyParser {
 //			}
 		}
 	}
+	
+	public static void exportDotGraph( Collection list, File file ) throws FileNotFoundException
+	{
+		PrintStream f=new PrintStream( new FileOutputStream( file ) );
+		f.println( "digraph classes {" );
+		
+		for( Iterator<PrintRelation> i=list.iterator(); i.hasNext(); )
+		{
+			PrintRelation relation=i.next( );
+			try { f.println( relation.toRelationDot() ); } catch( Exception e ) { } //print relations only if relation exists
+		}
+		f.println( "}" );
+	}
+
 }
 

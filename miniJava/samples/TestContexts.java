@@ -6,52 +6,89 @@ class TestContexts {
 }
 
 class A {
-	public boolean m1( )
+	public int m1( )
 	{
-		boolean test;
+		a variable;
+		int temp;
 		
-		test=this.m2();
-		test=this.m3();
-		return true;
-	}
-
-	public boolean m2( )
-	{
-		boolean test;
+		variable=this.m3( new b() );
+		variable=this.m3( new c() );
+		temp=this.m2();
 		
-		test=this.m3();
-		test=this.m4();
-		return true;
+		return 1;
 	}
-
-	public boolean m3( )
+	
+	public int m2( )
 	{
-		boolean test;
+		a variable;
 		
-		test=this.m2();
-		test=this.m4();
-		test=this.m5();
-		return true;
-	}
-
-	public boolean m4( )
-	{
-		boolean test;
+		variable=this.m3( new c() );
 		
-		test=this.m6();
-		return true;
+		return 1;
 	}
-
-	public boolean m5( )
+	
+	public a m3( a var )
 	{
-		boolean test;
-		
-		test=this.m6();
-		return true;
-	}
-
-	public boolean m6( )
-	{
-		return true;
+		return var;
 	}
 }
+
+class a {
+}
+
+class b extends a {
+}
+
+class c extends b {
+}
+
+//class A {
+//	public boolean m1( )
+//	{
+//		boolean test;
+//		
+//		test=this.m2();
+//		test=this.m3();
+//		return true;
+//	}
+//
+//	public boolean m2( )
+//	{
+//		boolean test;
+//		
+//		test=this.m3();
+//		test=this.m4();
+//		return true;
+//	}
+//
+//	public boolean m3( )
+//	{
+//		boolean test;
+//		
+//		test=this.m2();
+//		test=this.m4();
+//		test=this.m5();
+//		return true;
+//	}
+//
+//	public boolean m4( )
+//	{
+//		boolean test;
+//		
+//		test=this.m6();
+//		return true;
+//	}
+//
+//	public boolean m5( )
+//	{
+//		boolean test;
+//		
+//		test=this.m6();
+//		return true;
+//	}
+//
+//	public boolean m6( )
+//	{
+//		return true;
+//	}
+//}

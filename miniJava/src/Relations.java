@@ -13,6 +13,10 @@ public class Relations
 		{
 			return toString( );
 		}
+
+		public String toRelationDot() throws NoRelation {
+			return toRelation( );
+		}
 	}
 
 	public static class TwoSymbols extends Unknown 
