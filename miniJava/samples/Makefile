@@ -55,6 +55,7 @@ datalog:
 
 %.a4.pdf:
 	dot -Tpdf -o $@ ../benchmark/a4/$(@:.a4.pdf=)/call_graph.dot
+	dot -Tpdf -o $(@:.pdf=.classes.pdf) ../benchmark/a4/$(@:.a4.pdf=)/class_diagram.dot
 
 clean:
 	rm *.a1
