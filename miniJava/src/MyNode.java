@@ -40,7 +40,7 @@ public class MyNode {
 	
 	protected static List<Relations.mI>			 _mI      =new LinkedList<Relations.mI>();
 	protected static List<Relations.TwoSymbols>  _callreturn=new LinkedList<Relations.TwoSymbols>();
-	protected static List<Relations.ReturnWithType>  _return  =new LinkedList<Relations.ReturnWithType>();
+	protected static List<Relations.TwoSymbols>  _return  =new LinkedList<Relations.TwoSymbols>();
 	
 	protected static CallGraph					_call_graph=new CallGraph();
 	
@@ -84,7 +84,7 @@ public class MyNode {
 		for( Iterator<Relations.mI>      i=_mI.iterator();i.hasNext(); ) i.next().dump();
 	
 		System.out.println( "== Relations: return ==" );
-		for( Iterator<Relations.ReturnWithType>      i=_return.iterator();i.hasNext(); ) i.next().dump();
+		for( Iterator<Relations.TwoSymbols>      i=_return.iterator();i.hasNext(); ) i.next().dump();
 		System.out.println( "== Relations: callreturn ==" );
 		for( Iterator<Relations.TwoSymbols>      i=_callreturn.iterator();i.hasNext(); ) i.next().dump();
 	}

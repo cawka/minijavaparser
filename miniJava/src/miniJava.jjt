@@ -271,7 +271,7 @@ Symbols.Function MethodDeclaration( SymbId path )  :
       
    {
    		func._return=ret;
-   		if( ret!=null ) jjtThis._return.add( new Relations.ReturnWithType(func,ret) );
+   		if( ret!=null ) jjtThis._return.add( new Relations.TwoSymbols(func,ret) );
    		return func;
    }
 }

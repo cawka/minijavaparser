@@ -135,7 +135,7 @@ public class MyParser {
 		exportRelationsToFile( node._mI, mI, "M0:65535 I0:65535 N0:65535" );
 		
 		File _return=new File( dir+"/return.tuples" );
-		exportRelationsToFile( node._return, _return, "M0:65535 V0:65535 T0:65535" );
+		exportRelationsToFile( node._return, _return, "M0:65535 V0:65535" );
 		
 		File callreturn=new File( dir+"/callreturn.tuples" );
 		exportRelationsToFile( node._callreturn, callreturn, "I0:65535 V0:65535" );

@@ -65,6 +65,11 @@ public class Symbols {
 			if( _type==null ) throw new NoRelation();
 			return _name._line+" "+_type._name._line;
 		}
+
+		public String toRelationDot() throws NoRelation {
+			if( _type==null ) throw new NoRelation();
+			return "\""+_type._name.getName()+"\" -> \""+_name.getName()+"\"";
+		}
 	};
 	
 	public static class Heap extends Variable 
