@@ -1,4 +1,4 @@
-SOURCES=TestClasses.java
+SOURCES=TestContexts.java
 #SOURCES=Factorial.java  TestClasses.java TestContexts.java \
 #BinaryTree.java         LinearSearch.java       MoreThan4.java          TreeVisitor.java \
 #BubbleSort.java         LinkedList-error.java   \
