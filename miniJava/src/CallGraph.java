@@ -1,4 +1,5 @@
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -16,25 +17,13 @@ public class CallGraph
 		_all_nodes.put( name, n );		
 	}
 	
-//	public CallGraph( )
-//	{
-//		_all_nodes.put( "1", new Node("1") );
-//		_all_nodes.put( "2", new Node("2") );
-//		_all_nodes.put( "3", new Node("3") );
-//		_all_nodes.put( "4", new Node("4") );
-//		_all_nodes.put( "5", new Node("5") );
-//		_all_nodes.put( "6", new Node("6") );
-//		
-//		_all_nodes.get( "1" ).addEdge( "2" )
-//							 .addEdge( "3" );
-//		_all_nodes.get( "2" ).addEdge( "3" )
-//							 .addEdge( "5" );
-//		_all_nodes.get( "3" ).addEdge( "2" )
-//							 .addEdge( "4" )
-//							 .addEdge( "5" )
-//							 .addEdge( "6" );
-//		_all_nodes.get( "4" ).addEdge( "3" );
-//	}
+	public static boolean find( Collection list, Object obj )
+	{
+		for( Iterator<Object> i=list.iterator(); i.hasNext(); )
+			if( obj.equals(obj) ) return true;
+		
+		return false;
+	}
 	
 	static class CallsMap
 	{
@@ -49,7 +38,7 @@ public class CallGraph
 				_calls.put( caller, calls );
 			}
 			
-			calls.add( call );
+			if( !find(calls,call) ) calls.add( call );
 			return calls;
 		}
 		
@@ -220,49 +209,32 @@ public class CallGraph
 			return next;
 		}
 
-		public Node collapseOut( Node next )
-		{
-			next.group( this );
-			removeAll( next._out_s, this );
-			next._out_s.addAll( _out_s ); removeAll( next._out_s, next );
-
-			moveNonCycleEdges( next );
-			return next;
-		}
-		
 		public Node collapse( )
 		{
 			Node ret=null;
 
 			for( Iterator<Node> i=_out_s.iterator(); i.hasNext(); )
 			{
-//				Node node=i.next( );
-//				String name=node.getFirstName();
-//				ret=_all_nodes.get( name );
 				ret=_all_nodes.get( i.next( ).getFirstName() );
 				collapseIn( ret );
 				for( Iterator<String> s=_name.values().iterator(); s.hasNext(); )
 					replaceNode( s.next(), ret );
 				//return null;
-				removeAll( _in_s, ret );
+				removeFromAllCycles( this );
 			}
 			if( ret!=null ) { replateList( ret ); ret=null; }
 			
-//			for( Iterator<Node> i=_in_s.iterator(); i.hasNext(); )
-//			{
-////				ret=_all_nodes.get( i.next( ).getFirstName() );
-//				Node node=i.next( );
-//				String name=node.getFirstName();
-//				ret=_all_nodes.get( name );
-//				
-//				collapseOut( ret );
-//				for( Iterator<String> s=_name.values().iterator(); s.hasNext(); )
-//					replaceNode( s.next(), ret );
-//				removeAll( _in_s, ret );
-//			}
-//			if( ret!=null ) { replateList( ret ); ret=null; }
-			
 			return null;
+		}
+		
+		public static void removeFromAllCycles( Node node )
+		{
+			for( Iterator<Node> i=_all_nodes_list.iterator(); i.hasNext(); )
+			{
+				Node n=i.next( );
+				removeAll( n._in_s, node );
+				removeAll( n._out_s, node );
+			}
 		}
 		
 		public void replateList( Node ret )
