@@ -140,7 +140,9 @@ public class MyParser {
 		File callreturn=new File( dir+"/callreturn.tuples" );
 		exportRelationsToFile( node._callreturn, callreturn, "I0:65535 V0:65535" );
 
-		
+		File call_graph_orig=new File( dir+"/call_graph_orig.dot" );
+		node._call_graph.dumpGraphCycles( new PrintStream(new FileOutputStream(call_graph_orig)) );
+
 		node._call_graph.findCycles( ); node._call_graph.collapse( );
 		
 		File mIc=new File( dir+"/mIc.tuples" );
@@ -334,6 +336,7 @@ public class MyParser {
 	public static void exportDotGraph( Collection list, File file ) throws FileNotFoundException
 	{
 		PrintStream f=new PrintStream( new FileOutputStream( file ) );
+//		f=System.out;
 		f.println( "digraph classes {" );
 		
 		for( Iterator<PrintRelation> i=list.iterator(); i.hasNext(); )

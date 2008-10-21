@@ -150,6 +150,11 @@ public class CallGraph
 			return "\""+name+" ("+_context_num+")\"";
 		}
 		
+		public String getFirstName( )
+		{
+			return _name.values().iterator().next();
+		}
+		
 		public String toString( )
 		{
 			String ret="";
@@ -166,6 +171,15 @@ public class CallGraph
 			return ret;
 		}
 		
+		public String toStringCycles( )
+		{
+			String ret="";
+			for( Iterator<Node> i=_out_s.iterator(); i.hasNext(); )
+				ret=ret+getName()+" -> "+(ret.equals("")?"":" ")+i.next().getName( )+"\n";
+
+			return ret;
+		}
+
 		public static void removeAll( List<Node> list, Node node )
 		{
 			boolean full=true; 
@@ -222,45 +236,55 @@ public class CallGraph
 
 			for( Iterator<Node> i=_out_s.iterator(); i.hasNext(); )
 			{
-				ret=i.next( );
+//				Node node=i.next( );
+//				String name=node.getFirstName();
+//				ret=_all_nodes.get( name );
+				ret=_all_nodes.get( i.next( ).getFirstName() );
 				collapseIn( ret );
 				for( Iterator<String> s=_name.values().iterator(); s.hasNext(); )
 					replaceNode( s.next(), ret );
 				//return null;
 				removeAll( _in_s, ret );
 			}
+			if( ret!=null ) { replateList( ret ); ret=null; }
 			
-			for( Iterator<Node> i=_in_s.iterator(); i.hasNext(); )
-			{
-				ret=i.next();
-				collapseOut( ret );
-				for( Iterator<String> s=_name.values().iterator(); s.hasNext(); )
-					replaceNode( s.next(), ret );
-				removeAll( _in_s, ret );
-			}
-			if( ret!=null )	
-			{
-				_all_nodes_list.remove( this ); // node was collapsed
-				// replace all references to this in _in_s and _out_s rules
-				// it doesn't matter what ret node will be. All cycles will be collapsed to single node at the end
-				
-				for( Iterator<Node> i=_all_nodes_list.iterator(); i.hasNext(); )
-				{
-					Node n=i.next( );
-					if( !n.equals(ret) )
-					{
-						replaceInList( n._in_s, this, ret );
-						replaceInList( n._out_s, this, ret );
-					}
-					else
-					{
-						removeAll( n._in_s, this );
-						removeAll( n._out_s, this );
-					}
-				}
-			}
+//			for( Iterator<Node> i=_in_s.iterator(); i.hasNext(); )
+//			{
+////				ret=_all_nodes.get( i.next( ).getFirstName() );
+//				Node node=i.next( );
+//				String name=node.getFirstName();
+//				ret=_all_nodes.get( name );
+//				
+//				collapseOut( ret );
+//				for( Iterator<String> s=_name.values().iterator(); s.hasNext(); )
+//					replaceNode( s.next(), ret );
+//				removeAll( _in_s, ret );
+//			}
+//			if( ret!=null ) { replateList( ret ); ret=null; }
 			
 			return null;
+		}
+		
+		public void replateList( Node ret )
+		{
+			_all_nodes_list.remove( this ); // node was collapsed
+			// replace all references to this in _in_s and _out_s rules
+			// it doesn't matter what ret node will be. All cycles will be collapsed to single node at the end
+			
+			for( Iterator<Node> i=_all_nodes_list.iterator(); i.hasNext(); )
+			{
+				Node n=i.next( );
+				if( !n.equals(ret) )
+				{
+					replaceInList( n._in_s, this, ret );
+					replaceInList( n._out_s, this, ret );
+				}
+				else
+				{
+					removeAll( n._in_s, this );
+					removeAll( n._out_s, this );
+				}
+			}
 		}
 		
 		public void replaceInList( List<Node> list, Node invalid, Node valid )
@@ -357,7 +381,17 @@ public class CallGraph
 		os.println( "digraph TheGraph {" ); 
 		for( Iterator<Node> i=_all_nodes_list.iterator(); i.hasNext(); )
 		{
-			os.println( i.next() );
+			os.println( i.next().toString() );
+		}
+		os.println( "}" );
+	}
+	
+	public void dumpGraphCycles( PrintStream os )
+	{
+		os.println( "digraph TheGraph {" ); 
+		for( Iterator<Node> i=_all_nodes.values().iterator(); i.hasNext(); )
+		{
+			os.println( i.next().toStringCycles() );
 		}
 		os.println( "}" );
 	}
