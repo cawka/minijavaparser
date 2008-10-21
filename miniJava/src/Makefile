@@ -1,4 +1,2 @@
-all: miniJava.jjt
-	jjtree miniJava.jjt
-	javacc miniJava.jj
-
+all: 
+	make -C edu/ucla/parser/miniJava/javacc

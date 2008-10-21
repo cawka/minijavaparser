@@ -1,0 +1,743 @@
+options {
+  JAVA_UNICODE_ESCAPE = true;
+  MULTI = true;
+  NODE_EXTENDS = "MyNode";
+}
+
+PARSER_BEGIN(MiniJavaParser)
+package edu.ucla.parser.miniJava.javacc;
+
+import java.util.List;
+import java.util.Vector;
+
+import edu.ucla.parser.miniJava.callgraph.GraphNode;
+import edu.ucla.parser.miniJava.relations.TwoSymbols;
+import edu.ucla.parser.miniJava.relations.mI;
+import edu.ucla.parser.miniJava.symbols.Call;
+import edu.ucla.parser.miniJava.symbols.Class;
+import edu.ucla.parser.miniJava.symbols.Function;
+import edu.ucla.parser.miniJava.symbols.Heap;
+import edu.ucla.parser.miniJava.symbols.ReturnVariable;
+import edu.ucla.parser.miniJava.symbols.SymbId;
+import edu.ucla.parser.miniJava.symbols.Variable;
+
+public class MiniJavaParser 
+{
+	public Node getRoot( )
+	{
+		return jjtree.rootNode( );
+	}
+}
+PARSER_END(MiniJavaParser)
+
+SKIP : /* WHITE SPACE */
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| "\f"
+}
+
+SPECIAL_TOKEN : /* COMMENTS */
+{
+  <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+| <FORMAL_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+| <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+}
+
+TOKEN : 
+{
+  < LPAREN: "(" >
+| < RPAREN: ")" >
+| < LSQPAREN: "[" >
+| < RSQPAREN: "]" >
+| < LBRACE: "{" >
+| < RBRACE: "}" >
+| < SEMICOLON: ";" >
+| < DOT: "." >
+| < ASSIGN: "=" >
+| < LT: "<" >
+| < PLUS: "+" >
+| < MINUS: "-" >
+| < AND : "&&" >   
+| < NOT : "!" >   
+| < BOOLEAN: "boolean" >   
+| < CLASS: "class" >
+| < INTERFACE: "interface" >
+| < ELSE: "else" >
+| < EXTENDS: "extends" >
+| < FALSE: "false" >
+| < IF: "if" >
+| < WHILE: "while" >
+| < INTEGER: "int" >   
+| < LENGTH: "length" >
+| < MAIN: "main" >
+| < NEW: "new" >
+| < PUBLIC: "public" >
+| < RETURN: "return" >
+| < STATIC: "static" >
+| < STRING: "String" >
+| < THIS: "this" >
+| < TRUE: "true" >
+| < PRINT: "System.out.println" >
+| < VOID: "void" >         
+}
+
+TOKEN : /* LITERALS */
+{
+  < INTEGER_LITERAL: ( ["1"-"9"] (["0"-"9"])* | "0" ) >
+}
+
+TOKEN : /* IDENTIFIERS */
+{
+  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
+|
+  < #LETTER:
+      [
+       "\u0024",
+       "\u0041"-"\u005a",
+       "\u005f",
+       "\u0061"-"\u007a",
+       "\u00c0"-"\u00d6",
+       "\u00d8"-"\u00f6",
+       "\u00f8"-"\u00ff",
+       "\u0100"-"\u1fff",
+       "\u3040"-"\u318f",
+       "\u3300"-"\u337f",
+       "\u3400"-"\u3d2d",
+       "\u4e00"-"\u9fff",
+       "\uf900"-"\ufaff"
+      ]
+  >
+|
+  < #DIGIT:
+      [
+       "\u0030"-"\u0039",
+       "\u0660"-"\u0669",
+       "\u06f0"-"\u06f9",
+       "\u0966"-"\u096f",
+       "\u09e6"-"\u09ef",
+       "\u0a66"-"\u0a6f",
+       "\u0ae6"-"\u0aef",
+       "\u0b66"-"\u0b6f",
+       "\u0be7"-"\u0bef",
+       "\u0c66"-"\u0c6f",
+       "\u0ce6"-"\u0cef",
+       "\u0d66"-"\u0d6f",
+       "\u0e50"-"\u0e59",
+       "\u0ed0"-"\u0ed9",
+       "\u1040"-"\u1049"
+      ]
+  >
+}
+
+
+/************************************
+ * The MiniJava Grammar Starts Here *
+ ************************************/
+
+
+void Goal() :
+{}
+{
+  MainClass()
+  ( TypeDeclaration() )*
+  <EOF>
+}
+
+void MainClass() :
+{
+	Token t;
+}
+{
+  "class" t=Identifier() "{"
+    "public" "static" "void" "main" "(" "String" "[" "]" Identifier() ")"   
+    "{" PrintStatement( new SymbId(new SymbId( t.image ),"main") )  "}"
+  "}"
+}
+
+void TypeDeclaration() :  
+{}
+{ 
+  LOOKAHEAD(3)
+  ClassDeclaration()
+|
+  ClassExtendsDeclaration()
+}
+
+void ClassDeclaration() :
+{
+	Token t;
+	String oldPath="";
+	Class c;
+	SymbId s_id;
+	Variable var;
+	Function func;
+	Variable future_this;
+}
+{
+	"class" t=Identifier()
+	{
+		s_id=new SymbId( t.image );
+		c=new Class( s_id, "", jjtThis.pos(jj_input_stream), null );
+
+		future_this=jjtThis._symbols.get(new SymbId( s_id,"this" ));
+		if( future_this==null )
+		{
+			future_this=new Variable( new SymbId(s_id,"this"), t.image,"","java" );
+			jjtThis._symbols.put( new SymbId(s_id,"this"), future_this );
+		}
+		jjtThis._types.put( s_id, c );
+	} 
+  	"{" 
+//  		( var =VarDeclaration   (s_id) {c._variables.put(var ._name.getName(),var);} )* 
+//        ( func=MethodDeclaration(s_id) {c._methods  .put(func._name.getName(),func); })*
+  		( var =VarDeclaration   (s_id) {c._variables.put(var. _name.getName(),var);} )* 
+        ( 
+        	func=MethodDeclaration(s_id) 
+        {
+        	func._this=future_this;
+        	c._methods  .put(func._name.getName(),func); 
+        }
+        )*
+    "}"
+}
+
+void ClassExtendsDeclaration() :
+{
+	Token t;
+	Token parentClass;
+	String oldPath;
+	Class symbol;
+	Class c;
+	SymbId s_id;
+	Variable var;
+	Function func;
+	Variable future_this;
+}
+{
+  "class" t=Identifier() "extends" parentClass=Identifier()
+  {
+  		s_id=new SymbId( t.image );
+  		
+  		c=new Class( s_id, "",jjtThis.pos(jj_input_stream), parentClass.image );
+		
+		future_this=jjtThis._symbols.get(new SymbId( s_id,"this" ));
+		if( future_this==null )
+		{
+			future_this=new Variable( new SymbId(s_id,"this"), t.image,"","java" );
+			jjtThis._symbols.put( new SymbId(s_id,"this"), future_this );
+		}
+  		jjtThis._types.put( s_id, c );
+  }
+  
+   "{" 
+  		( var =VarDeclaration   (s_id) {c._variables.put(var. _name.getName(),var);} )* 
+        ( 
+        	func=MethodDeclaration(s_id) 
+        {
+        	func._this=future_this;
+        	c._methods  .put(func._name.getName(),func); 
+        }
+        )*
+  "}"
+}
+
+Variable VarDeclaration( SymbId path ) :  
+{ Token t; 
+  String type;
+  String pos;
+  SymbId s_id;
+  Variable var;
+ }
+{ 
+	{ pos=jjtThis.pos(jj_input_stream); }
+	type=Type() t=Identifier() ";"
+	{
+		s_id=new SymbId(path,t.image);
+		var=new Variable(s_id,type,"",pos);
+		jjtThis._symbols.put( s_id, var );
+		return var;
+	}      
+}
+
+Function MethodDeclaration( SymbId path )  :  
+{ Token t; 
+  String type;
+  Function func;
+  String pos;
+  SymbId s_id;
+  Variable ret;
+}
+{
+  { pos=jjtThis.pos(jj_input_stream); }
+  "public" type=Type() t=Identifier() 
+  {
+  		s_id=new SymbId( path,t.image );
+  		jjtThis._name=s_id;
+		func=new Function( s_id,type,"",pos );
+  		jjtThis._methods.put( s_id, func );
+ 		if( jjtThis._call_graph._all_nodes.get(t.image)==null ) jjtThis._call_graph._all_nodes.put( t.image, new GraphNode(t.image) );
+   }
+  
+  "(" ( func._variables=FormalParameterList( s_id ) )? ")"   
+  
+  "{" ( LOOKAHEAD(2) VarDeclaration(s_id) )* 
+      ( Statement(s_id) )* "return" ret=Expression(s_id) ";" "}" { /* we are only interested if return value is variable or heap */}
+      
+   {
+   		func._return=ret;
+   		if( ret!=null ) jjtThis._return.add( new TwoSymbols(func,ret) );
+   		return func;
+   }
+}
+
+Vector<Variable> FormalParameterList(SymbId path) #void :
+{
+	Vector<Variable> list=new Vector<Variable>();
+	Variable par;
+}
+{
+  par=FormalParameter(path) 
+  { list.add( par ); }
+  ( 
+  	par=FormalParameterRest(path)
+  	{ list.add( par ); } 
+  )*
+  
+  { return list; }
+}
+
+Variable FormalParameter(SymbId path) :
+{ Token t; 
+  String type;
+  String pos;
+  Variable symb; 
+  SymbId s_id;
+}
+{
+	{ 	
+		pos=jjtThis.pos(jj_input_stream); 
+	}
+	type=Type() t=Identifier()
+	{
+		s_id=new SymbId( path, t.image );
+		symb=new Variable( s_id,type,"",pos );
+		jjtThis._symbols.put( s_id,symb );
+		return symb;
+	}
+}
+
+Variable FormalParameterRest(SymbId path) #void :
+{ Variable symb; }
+{
+  "," symb=FormalParameter(path)
+  { return symb; }  
+}
+
+String Type() :
+{ 
+	Token t; 
+	String ret;
+}
+{
+(
+  LOOKAHEAD(3)
+  ret=ArrayType()
+|
+  ret=BooleanType()
+|
+  ret=IntegerType()
+|
+  t=Identifier()  
+  {
+  		ret=t.image;
+  }
+)
+	{ return ret; }   
+}
+
+String ArrayType() :
+{ }
+{  
+  "int" "[" "]"
+  
+  { 
+  		return "int[]";
+  }
+}
+
+String BooleanType() #void :
+{}
+{
+  "boolean"
+  
+  { return ""; }
+}
+
+String IntegerType() #void :
+{}
+{
+  "int"
+  
+  { return ""; }
+}
+
+void Statement(SymbId scope) :
+{}
+{
+  Block(scope)
+| 
+  LOOKAHEAD(2)
+  AssignmentStatement(scope)
+|
+  LOOKAHEAD(2)
+  ArrayAssignmentStatement(scope)
+|
+  IfStatement(scope)
+|
+  WhileStatement(scope)
+|
+  PrintStatement(scope)
+}
+
+void Block(SymbId scope)  :
+{
+	String unique_name;
+	SymbId subscope;
+}
+{
+	{
+		unique_name="block_"+jjtThis.pos(jj_input_stream);
+		subscope=new SymbId( scope, unique_name );
+	}
+  "{" ( Statement(scope) )* "}"
+}
+
+void AssignmentStatement(SymbId scope)  :
+{
+	Token t;
+	Variable left,right;
+}
+{
+  t=Identifier() "=" right=Expression(scope) ";"
+  
+  {
+		left=jjtThis.variableLookup( t.image,scope );
+		if( left==right && right==null ) return; // either int=int or something like this
+		if( (left!=null && right==null) ||
+			(left==null && right!=null) ) 
+		{
+			return;
+			throw new Error( "Syntax error in assignment "+jjtThis.pos(jj_input_stream) );
+		}
+		
+		if( right instanceof Heap )
+			jjtThis._vP0.add( new TwoSymbols(left,right) );
+		else
+			jjtThis._assign.add( new TwoSymbols(left,right) );
+  }
+}
+
+void ArrayAssignmentStatement(SymbId scope)  : // do not care about this assignment. 
+											   // Because it's applicable only to integer array elements assignments
+{}
+{
+  Identifier() "[" Expression(scope) "]" "=" Expression(scope) ";"
+}
+
+void IfStatement(SymbId scope)  :
+{
+	String unique_name;
+	SymbId subscope;
+}
+{
+	{
+		unique_name="if_"+jjtThis.pos(jj_input_stream);
+		subscope=new SymbId( scope, unique_name );
+	}
+	"if" "(" Expression(scope) ")" Statement(subscope) "else" Statement(subscope) 
+}
+
+void WhileStatement(SymbId scope) :
+{
+	String unique_name;
+	SymbId subscope;
+}
+{
+	{
+		unique_name="while_"+jjtThis.pos(jj_input_stream);
+		subscope=new SymbId( scope, unique_name );
+	}
+  "while" "(" Expression(subscope) ")" Statement(subscope) 
+}
+
+void PrintStatement(SymbId scope) #Statement :
+{}
+{
+  "System.out.println" "(" Expression(scope) ")" ";"
+}
+
+Variable Expression(SymbId scope) :
+{
+	Variable ret=null;
+}
+{
+(
+  LOOKAHEAD( PrimaryExpression(scope) "&&" )
+  AndExpression(scope) // return value can't be variable or heap
+|
+  LOOKAHEAD( PrimaryExpression(scope) "<" )
+  CompareExpression(scope) // return value can't be variable or heap
+|
+  LOOKAHEAD( PrimaryExpression(scope) "+" )
+  PlusExpression(scope) // return value can be only int type
+|
+  LOOKAHEAD( PrimaryExpression(scope) "-" )
+  MinusExpression(scope) // return value can be only int type
+|
+  LOOKAHEAD( PrimaryExpression(scope) "*" )
+  TimesExpression(scope) // return value can be only int type
+|
+  LOOKAHEAD( PrimaryExpression(scope) "[" )
+  ArrayLookup(scope) // return value can be only int type
+|
+  LOOKAHEAD( PrimaryExpression(scope) "." "length" )
+  ArrayLength(scope) // return value can be only int type
+|
+  LOOKAHEAD( PrimaryExpression(scope) "." Identifier() "(" )
+  ret=MessageSend(scope)
+| 
+  ret=PrimaryExpression(scope)
+)
+	{ return ret; }
+}
+
+void AndExpression(SymbId scope) #void :
+{} 
+{
+  PrimaryExpression(scope) "&&" PrimaryExpression(scope)
+}
+
+void CompareExpression(SymbId scope) #void :
+{} 
+{
+  PrimaryExpression(scope) "<" PrimaryExpression(scope)
+}
+
+void PlusExpression(SymbId scope) #void :
+{}
+{
+  PrimaryExpression(scope) "+" PrimaryExpression(scope)
+}
+
+void MinusExpression(SymbId scope) #void :
+{}
+{
+  PrimaryExpression(scope) "-" PrimaryExpression(scope)
+}
+
+void TimesExpression(SymbId scope) #void :
+{}
+{
+  PrimaryExpression(scope) "*" PrimaryExpression(scope)
+}
+
+void ArrayLookup(SymbId scope) #void :
+{}
+{
+  PrimaryExpression(scope) "[" PrimaryExpression(scope) "]"
+}
+
+void ArrayLength(SymbId scope) #void :
+{}
+{
+  PrimaryExpression(scope) "." "length"
+}
+
+Variable MessageSend(SymbId scope)  :
+{
+	Variable var;
+	Token t;
+	Vector<Variable> actual_params=new Vector<Variable>();
+	String pos;
+	Function invocation_method;
+	Call call;
+}
+{
+	{ pos=jjtThis.pos(jj_input_stream); }
+
+	  var=PrimaryExpression(scope) "." t=Identifier() 
+	  "(" ( actual_params=ExpressionList(scope) )? ")"
+
+  {
+  		if( jjtThis._call_graph._all_nodes.get(t.image)==null ) jjtThis._call_graph._all_nodes.put( t.image, new GraphNode(t.image) );
+  
+  		if( var==null ) throw new Error( "Method call on non-class variable ["+pos+"]" );
+  		invocation_method=jjtThis._methods.get( scope.getScopeLevel(2) );
+  		if( invocation_method==null )
+  		{
+  			invocation_method=jjtThis._methods.get( new SymbId("STATIC") );
+  			if( invocation_method==null ) throw new Error( "STATIC method should be inserted into _methods map before parsing" );
+  		}
+		
+		ReturnVariable ret=new ReturnVariable( new SymbId(scope,t.image+"$call"+pos),"",pos );
+		call=new Call(var, t.image, actual_params, "", pos, ret,invocation_method);
+   		jjtThis._calls.add( call );
+		
+		jjtThis._symbols.put( ret._name, ret );
+
+  		jjtThis._mI.add( new mI(invocation_method,call,t.image) );
+  		jjtThis._callreturn.add( new TwoSymbols(call,ret) );
+
+		String callee=invocation_method._name.getName();
+		if( !callee.equals(t.image) ) jjtThis._call_graph._all_nodes.get( callee ).addEdge( invocation_method, call, t.image );
+
+		return ret;
+  }
+}
+
+Vector<Variable> ExpressionList(SymbId scope) #void :
+{
+	Vector<Variable> list=new Vector<Variable>();
+	Variable var;
+}
+{
+	var=Expression(scope)
+	{ list.add( var ); }
+	 
+	( 
+		var=ExpressionRest(scope) 
+		{ list.add( var ); }
+	)*
+	
+	{ return list; }
+}
+
+Variable ExpressionRest(SymbId scope) #void :
+{
+	Variable var; 
+}
+{
+	"," var=Expression(scope)
+	{ return var; }
+}
+
+Variable PrimaryExpression(SymbId scope) :
+{
+	Variable ret=null;
+	Token t;
+}
+{
+(
+  IntegerLiteral()
+|
+  TrueLiteral()
+|
+  FalseLiteral()
+|
+  t=Identifier()
+  { ret=jjtThis.variableLookup(t.image,scope); }
+|
+  ret=ThisExpression(scope)
+|
+  LOOKAHEAD(3)
+  ret=ArrayAllocationExpression(scope)
+|
+  ret=AllocationExpression(scope)
+|   
+  NotExpression(scope)
+|   
+  ret=BracketExpression(scope)
+  )
+  { return ret; }
+}
+
+void IntegerLiteral() #void :
+{}
+{
+  <INTEGER_LITERAL>
+}
+
+
+void TrueLiteral() #void :
+{}
+{
+  "true"
+}
+
+void FalseLiteral() #void :
+{}
+{
+  "false"
+}
+
+Token Identifier() #void :
+{ Token t; }
+{
+   t=<IDENTIFIER>
+   {return t;}
+}
+
+Variable ThisExpression(SymbId path)  :
+{}
+{
+  "this"
+  { return jjtThis.variableLookup( "this", path ); }
+}
+
+Variable ArrayAllocationExpression(SymbId path)  :
+{
+	Heap heap;
+	String pos;
+}
+{
+  { pos=jjtThis.pos(jj_input_stream); }
+  "new" "int" "[" Expression(path) "]"
+  {
+		heap=new Heap( new SymbId("new int[]"),"int[]","",pos );
+		jjtThis._heaps.add( heap );
+		return heap; 
+  }
+}
+
+Variable AllocationExpression(SymbId path) :
+{
+	Heap heap;
+	String pos;
+	Token t;
+}
+{
+  { pos=jjtThis.pos(jj_input_stream); }
+  "new" t=Identifier() "(" ")"
+  {
+		heap=new Heap( new SymbId("new "+t.image+"()"),t.image,"",pos );
+		jjtThis._heaps.add( heap );
+		
+		Variable var=jjtThis._symbols.get( new SymbId(new SymbId( t.image ),"this") );
+		if( var==null ) 
+		{
+			var=new Variable( new SymbId(new SymbId( t.image ),"this"),t.image,"","java" );
+			jjtThis._symbols.put( new SymbId(new SymbId( t.image ),"this"), var );
+		}
+
+		return var;
+  }
+}
+
+void NotExpression(SymbId path) #void :
+{}
+{
+  "!" Expression(path) 
+}
+
+Variable BracketExpression(SymbId path) #void :
+{
+	Variable ret;
+}
+{
+  "(" ret=Expression(path) ")"
+  { return ret; }
+}
+
