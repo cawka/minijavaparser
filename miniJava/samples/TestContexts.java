@@ -1,94 +1,69 @@
 class TestContexts {
 	public static void main( String[] preved )
 	{
-		System.out.println( new A().m1() );
+		System.out.println( new A().recombine( ) );
 	}
 }
 
 class A {
-	public int m1( )
+	public int recombine( )
 	{
-		a variable;
-		int temp;
+		atom var;
 		
-		variable=this.m3( new b() );
-		variable=this.m3( new c() );
-		temp=this.m2();
+		var=this.sintesis( new atom() );
+		var=this.join( new molecule() );
 		
 		return 1;
 	}
 	
-	public int m2( )
+	public atom sintesis( atom var )
 	{
-		a variable;
+		atom tmp;
 		
-		variable=this.m3( new c() );
+		tmp=this.join( new atom() );
 		
-		return 1;
-	}
-	
-	public a m3( a var )
-	{
 		return var;
 	}
+	
+	public atom join( atom var )
+	{
+		boolean temp;
+		atom tmp2;
+		
+		if( 1<0 ) tmp2=this.sintesis( var ); else { }
+		temp=this.group( new molecule() );
+		temp=this.awake( new organism() );
+		return var;
+	}
+	
+	public boolean group( atom var )
+	{
+		boolean test;
+		atom temp;
+		
+		test=this.awake( var );
+		temp=this.sintesis( new cell() );
+		return true;
+	}
+
+	public boolean awake( atom var )
+	{
+		System.out.println( var.log_count() );
+		return true;
+	}
 }
 
-class a {
+class atom {
+	public int log_count( ) { return 24; }
 }
 
-class b extends a {
+class molecule extends atom {
+	public int log_count( ) { return 23; }
 }
 
-class c extends b {
+class cell extends molecule {
 }
 
-//class A {
-//	public boolean m1( )
-//	{
-//		boolean test;
-//		
-//		test=this.m2();
-//		test=this.m3();
-//		return true;
-//	}
-//
-//	public boolean m2( )
-//	{
-//		boolean test;
-//		
-//		test=this.m3();
-//		test=this.m4();
-//		return true;
-//	}
-//
-//	public boolean m3( )
-//	{
-//		boolean test;
-//		
-//		test=this.m2();
-//		test=this.m4();
-//		test=this.m5();
-//		return true;
-//	}
-//
-//	public boolean m4( )
-//	{
-//		boolean test;
-//		
-//		test=this.m6();
-//		return true;
-//	}
-//
-//	public boolean m5( )
-//	{
-//		boolean test;
-//		
-//		test=this.m6();
-//		return true;
-//	}
-//
-//	public boolean m6( )
-//	{
-//		return true;
-//	}
-//}
+class organism extends cell {
+	public int log_count( ) { return 0; }
+}
