@@ -26,7 +26,7 @@ cha (type:T, target:M, name:N) inputtuples printtuples
 actual (invoke:I, param:Z, var:V) inputtuples printtuples
 formal (method:M, param:Z, var:V) inputtuples printtuples
 mI (method:M, invoke:I, name:N) inputtuples printtuples
-return (method:M, variable:V, type:T) inputtuples printtuples
+return (method:M, variable:V) inputtuples printtuples
 callreturn (invocation:I, variable:V) inputtuples printtuples
 
 #output
@@ -34,7 +34,6 @@ vP	(variable:V,heap:H)		output outputtuples printtuples
 aT	(supertype:T, subtype:T)	output outputtuples printtuples
 IE	(invocation:I, method:M)	output outputtuples printtuples
 assign2 (variable:V,variable:V)	output printtuples
-#assign3 (variable:V,variable:V)	output printtuples
 
 #temporary
 vPfilter (variable:V,heap:H)
@@ -56,9 +55,9 @@ vP(v,h) :- vP0(v,h).
 vP(v1,h) :- assign2(v1,v2),vP(v2,h),vPfilter(v1,h).
 
 # to make sure, that return value of the right method will be delivered to the right place
-assign2(v1,v2) :- IE(i,m),callreturn(i,v1),return(m,v2,_).
+assign2(v1,v2) :- IE(i,m),callreturn(i,v1),return(m,v2).
 # Propagate type for temporary call variable
-vT(v,t) :- IE(i,m),callreturn(i,v),return(m,_,t).
+vT(v,t) :- IE(i,m),callreturn(i,v),return(m,v_tmp),vT(v_tmp,t).
 
 IE(i,m) :- mI(_,i,name),chaReal(type,m,name),actual(i,0,this),vP(this,h),hT(h,type).
 assign2(v1,v2) :- IE(i,m),actual(i,z,v2),formal(m,z,v1).

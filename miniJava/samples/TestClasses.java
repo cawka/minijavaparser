@@ -74,7 +74,7 @@ class FlyingBird extends Bird
 {
 }
 
-class Dinosaur extends Bird
+class Dinosaur extends Animal
 {
 	public Food search_for_food( )
 	{
