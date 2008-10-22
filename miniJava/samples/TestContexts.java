@@ -20,7 +20,7 @@ class A {
 	{
 		atom tmp;
 		
-		tmp=this.join( new atom() );
+		tmp=this.join( new organism() );
 		
 		return var;
 	}
@@ -31,39 +31,35 @@ class A {
 		atom tmp2;
 		
 		if( 1<0 ) tmp2=this.sintesis( var ); else { }
-		temp=this.group( new molecule() );
-		temp=this.awake( new organism() );
+		temp=this.group( new organism() );
+		temp=this.awake( var );
 		return var;
 	}
 	
 	public boolean group( atom var )
 	{
 		boolean test;
-		atom temp;
+		atom who_am_i;
 		
 		test=this.awake( var );
-		temp=this.sintesis( new cell() );
+		who_am_i=this.sintesis( new cell() );
 		return true;
 	}
 
 	public boolean awake( atom var )
 	{
-		System.out.println( var.log_count() );
 		return true;
 	}
 }
 
 class atom {
-	public int log_count( ) { return 24; }
 }
 
 class molecule extends atom {
-	public int log_count( ) { return 23; }
 }
 
 class cell extends molecule {
 }
 
 class organism extends cell {
-	public int log_count( ) { return 0; }
 }

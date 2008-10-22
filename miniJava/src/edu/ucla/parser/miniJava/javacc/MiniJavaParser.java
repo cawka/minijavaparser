@@ -160,18 +160,20 @@ public class MiniJavaParser/*@bgen(jjtree)*/implements MiniJavaParserTreeConstan
         Variable var;
         Function func;
         Variable future_this;
+        Heap heap;
     try {
       jj_consume_token(CLASS);
       t = Identifier();
                 s_id=new SymbId( t.image );
                 c=new Class( s_id, "", jjtn000.pos(jj_input_stream), null );
 
-                future_this=jjtn000._symbols.get(new SymbId( s_id,"this" ));
-                if( future_this==null )
-                {
-                        future_this=new Variable( new SymbId(s_id,"this"), t.image,"","java" );
-                        jjtn000._symbols.put( new SymbId(s_id,"this"), future_this );
-                }
+                future_this=new Variable( new SymbId(s_id,"this"), t.image,"","java" );
+                jjtn000._symbols.put( new SymbId(s_id,"this"), future_this );
+
+                heap=new Heap( new SymbId("new "+t.image+"()"),t.image,"","class_declaration" );
+                jjtn000._heaps.add( heap );
+                jjtn000._vP0.add( new TwoSymbols(future_this, heap) );
+
                 jjtn000._types.put( s_id, c );
       jj_consume_token(LBRACE);
       label_2:
@@ -238,6 +240,7 @@ public class MiniJavaParser/*@bgen(jjtree)*/implements MiniJavaParserTreeConstan
         Variable var;
         Function func;
         Variable future_this;
+        Heap heap;
     try {
       jj_consume_token(CLASS);
       t = Identifier();
@@ -247,12 +250,13 @@ public class MiniJavaParser/*@bgen(jjtree)*/implements MiniJavaParserTreeConstan
 
                 c=new Class( s_id, "",jjtn000.pos(jj_input_stream), parentClass.image );
 
-                future_this=jjtn000._symbols.get(new SymbId( s_id,"this" ));
-                if( future_this==null )
-                {
-                        future_this=new Variable( new SymbId(s_id,"this"), t.image,"","java" );
-                        jjtn000._symbols.put( new SymbId(s_id,"this"), future_this );
-                }
+                future_this=new Variable( new SymbId(s_id,"this"), t.image,"","java" );
+                jjtn000._symbols.put( new SymbId(s_id,"this"), future_this );
+
+                heap=new Heap( new SymbId("new "+t.image+"()"),t.image,"","class_declaration" );
+                jjtn000._heaps.add( heap );
+                jjtn000._vP0.add( new TwoSymbols(future_this, heap) );
+
                 jjtn000._types.put( s_id, c );
       jj_consume_token(LBRACE);
       label_4:
@@ -1212,6 +1216,7 @@ public class MiniJavaParser/*@bgen(jjtree)*/implements MiniJavaParserTreeConstan
         boolean jjtc000 = true;
         jjtree.openNodeScope(jjtn000);Heap heap;
         String pos;
+        Variable var;
     try {
     pos=jjtn000.pos(jj_input_stream);
       jj_consume_token(NEW);
@@ -1223,7 +1228,13 @@ public class MiniJavaParser/*@bgen(jjtree)*/implements MiniJavaParserTreeConstan
     jjtc000 = false;
                 heap=new Heap( new SymbId("new int[]"),"int[]","",pos );
                 jjtn000._heaps.add( heap );
-                {if (true) return heap;}
+
+                var=new Variable( new SymbId( path,"new_int[]"),"int[]","",pos );
+                jjtn000._symbols.put( new SymbId( path,"new_int[]"+pos), var );
+
+                jjtn000._vP0.add( new TwoSymbols(var,heap) );
+
+                {if (true) return var;}
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -1253,6 +1264,7 @@ public class MiniJavaParser/*@bgen(jjtree)*/implements MiniJavaParserTreeConstan
         jjtree.openNodeScope(jjtn000);Heap heap;
         String pos;
         Token t;
+        Variable var;
     try {
     pos=jjtn000.pos(jj_input_stream);
       jj_consume_token(NEW);
@@ -1264,12 +1276,10 @@ public class MiniJavaParser/*@bgen(jjtree)*/implements MiniJavaParserTreeConstan
                 heap=new Heap( new SymbId("new "+t.image+"()"),t.image,"",pos );
                 jjtn000._heaps.add( heap );
 
-                Variable var=jjtn000._symbols.get( new SymbId(new SymbId( t.image ),"this") );
-                if( var==null )
-                {
-                        var=new Variable( new SymbId(new SymbId( t.image ),"this"),t.image,"","java" );
-                        jjtn000._symbols.put( new SymbId(new SymbId( t.image ),"this"), var );
-                }
+                var=new Variable( new SymbId( path,"new_"+t.image),t.image,"",pos );
+                jjtn000._symbols.put( new SymbId( path,"new_"+t.image+pos), var );
+
+                jjtn000._vP0.add( new TwoSymbols(var,heap) );
 
                 {if (true) return var;}
     } catch (Throwable jjte000) {
@@ -1406,15 +1416,15 @@ public class MiniJavaParser/*@bgen(jjtree)*/implements MiniJavaParserTreeConstan
     finally { jj_save(13, xla); }
   }
 
+  static final private boolean jj_3R_32() {
+    if (jj_scan_token(BOOLEAN)) return true;
+    return false;
+  }
+
   static final private boolean jj_3R_11() {
     if (jj_scan_token(CLASS)) return true;
     if (jj_3R_17()) return true;
     if (jj_scan_token(LBRACE)) return true;
-    return false;
-  }
-
-  static final private boolean jj_3R_32() {
-    if (jj_scan_token(BOOLEAN)) return true;
     return false;
   }
 
@@ -1427,6 +1437,13 @@ public class MiniJavaParser/*@bgen(jjtree)*/implements MiniJavaParserTreeConstan
     if (jj_3R_16()) return true;
     if (jj_scan_token(DOT)) return true;
     if (jj_scan_token(LENGTH)) return true;
+    return false;
+  }
+
+  static final private boolean jj_3R_31() {
+    if (jj_scan_token(LPAREN)) return true;
+    if (jj_3R_34()) return true;
+    if (jj_scan_token(RPAREN)) return true;
     return false;
   }
 
@@ -1460,15 +1477,14 @@ public class MiniJavaParser/*@bgen(jjtree)*/implements MiniJavaParserTreeConstan
     return false;
   }
 
-  static final private boolean jj_3R_31() {
-    if (jj_scan_token(LPAREN)) return true;
-    if (jj_3R_34()) return true;
-    if (jj_scan_token(RPAREN)) return true;
+  static final private boolean jj_3R_21() {
+    if (jj_3R_28()) return true;
     return false;
   }
 
-  static final private boolean jj_3R_21() {
-    if (jj_3R_28()) return true;
+  static final private boolean jj_3R_30() {
+    if (jj_scan_token(NOT)) return true;
+    if (jj_3R_34()) return true;
     return false;
   }
 
@@ -1490,11 +1506,6 @@ public class MiniJavaParser/*@bgen(jjtree)*/implements MiniJavaParserTreeConstan
     return false;
   }
 
-  static final private boolean jj_3_1() {
-    if (jj_3R_11()) return true;
-    return false;
-  }
-
   static final private boolean jj_3R_27() {
     if (jj_3R_17()) return true;
     return false;
@@ -1506,14 +1517,13 @@ public class MiniJavaParser/*@bgen(jjtree)*/implements MiniJavaParserTreeConstan
     return false;
   }
 
-  static final private boolean jj_3R_30() {
-    if (jj_scan_token(NOT)) return true;
-    if (jj_3R_34()) return true;
+  static final private boolean jj_3R_26() {
+    if (jj_3R_33()) return true;
     return false;
   }
 
-  static final private boolean jj_3R_26() {
-    if (jj_3R_33()) return true;
+  static final private boolean jj_3_1() {
+    if (jj_3R_11()) return true;
     return false;
   }
 
@@ -1599,18 +1609,18 @@ public class MiniJavaParser/*@bgen(jjtree)*/implements MiniJavaParserTreeConstan
     return false;
   }
 
-  static final private boolean jj_3R_45() {
-    if (jj_3R_16()) return true;
-    if (jj_scan_token(LT)) return true;
-    if (jj_3R_16()) return true;
-    return false;
-  }
-
   static final private boolean jj_3R_29() {
     if (jj_scan_token(NEW)) return true;
     if (jj_3R_17()) return true;
     if (jj_scan_token(LPAREN)) return true;
     if (jj_scan_token(RPAREN)) return true;
+    return false;
+  }
+
+  static final private boolean jj_3R_45() {
+    if (jj_3R_16()) return true;
+    if (jj_scan_token(LT)) return true;
+    if (jj_3R_16()) return true;
     return false;
   }
 
@@ -1680,17 +1690,17 @@ public class MiniJavaParser/*@bgen(jjtree)*/implements MiniJavaParserTreeConstan
     return false;
   }
 
-  static final private boolean jj_3R_41() {
-    if (jj_3R_50()) return true;
-    return false;
-  }
-
   static final private boolean jj_3R_18() {
     if (jj_scan_token(NEW)) return true;
     if (jj_scan_token(INTEGER)) return true;
     if (jj_scan_token(LSQPAREN)) return true;
     if (jj_3R_34()) return true;
     if (jj_scan_token(RSQPAREN)) return true;
+    return false;
+  }
+
+  static final private boolean jj_3R_41() {
+    if (jj_3R_50()) return true;
     return false;
   }
 

@@ -27,11 +27,11 @@ public class Variable extends GeneralSymbol
 	
 	public void dump( String prefix ) {
 		super.dump( prefix );
-		if( _type==null ) return;
-		if( _type==null )
-			System.out.println( prefix+"\t"+"Unknown type" );
-		else
-			_type.dump( prefix+"\t: ");
+//		if( _type==null ) return;
+//		if( _type==null )
+//			System.out.println( prefix+"\t"+"Unknown type" );
+//		else
+//			_type.dump( prefix+"\t: ");
 	}
 	
 	public String toRelation( ) throws NoRelation

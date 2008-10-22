@@ -20,6 +20,7 @@ import edu.ucla.parser.miniJava.symbols.Call;
 import edu.ucla.parser.miniJava.symbols.Class;
 import edu.ucla.parser.miniJava.symbols.Function;
 import edu.ucla.parser.miniJava.symbols.GeneralSymbol;
+import edu.ucla.parser.miniJava.symbols.SymbId;
 import edu.ucla.parser.miniJava.symbols.Variable;
 
 
@@ -48,7 +49,8 @@ public class MyParser
 		try
 		{
 			MiniJavaParser parser=new MiniJavaParser( new java.io.FileInputStream(source_file) );
-			
+			MyNode._types.put( new SymbId("int[]"),   new Class(new SymbId("int[]"),  "","java",null) );
+
 			MiniJavaParser.Goal();
 			
 			parser.getRoot().resolveForwardDeclarations( );

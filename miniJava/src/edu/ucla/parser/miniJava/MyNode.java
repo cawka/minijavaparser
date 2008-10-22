@@ -98,7 +98,6 @@ public class MyNode
 	public void resolveForwardDeclarations( )
 	{
 //		_types.put( new SymbId("int"),     new Symbols.Class(new SymbId("int"),    "","java",null) );
-		_types.put( new SymbId("int[]"),   new Class(new SymbId("int[]"),  "","java",null) );
 //		_types.put( new SymbId("boolean"), new Symbols.Class(new SymbId("boolean"),"","java",null) );
 		
 //		new SymbId("int").equals( new SymbId("int") );

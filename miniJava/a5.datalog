@@ -37,11 +37,15 @@ aT	(supertype:T, subtype:T)	    printtuples
 IEc	(caller:C,invocation:I, callee:C,method:M)	printtuples
 assign2 (dest_c:C,dest:V,src_c:C,src:V)	output printtuples
 
+vTc (context:C,variable:V,type:T)		printtuples
+
 #temporary
 vPfilter (variable:V,heap:H)
 chaVirtual (type:T, target:M, name:N) printtuples
 chaFilter(type:T, name:N) printtuples
 chaReal (type:T, target:M, name:N) printtuples
+
+vTfilter(variable:V,type:T)
 
 ##############################################
 #RULES
@@ -52,10 +56,6 @@ aT(t1,t2) :- aT(t1,t),aT(t,t2).
 vPfilter(v,h) :- vT(v,t_v),hT(h,t_h),aT(t_v,t_h).
 
 assign2(c1,v1,c2,v2) :- mIc(_,c1,_,_,_),mIc(_,_,_,c2,_),assign(v1,v2).
-#assign2(c1,v1,c2,v2) :- mIc(_,c1,_,_,_),mIc(_,c2,_,_,_),assign(v1,v2).
-#assign2(c1,v1,c2,v2) :- mIc(_,_,_,c1,_),mIc(_,_,_,c2,_),assign(v1,v2).
-#assign2(c1,v1,c2,v2) :- mIc(_,_,_,c1,_),mIc(_,_,_,c2,_),assign(v1,v2).
-#assign2(c,v1,c,v2) :- mIc(_,_,_,c,_),assign(v1,v2).
 
 vPc(c,v,h) :- mIc(_,c,_,_,_),vP0(v,h).
 vPc(c,v,h) :- mIc(_,_,_,c,_),vP0(v,h).
@@ -75,3 +75,9 @@ assign2(c1,v1,c2,v2) :- IEc(c2,i,c1,m),actual(i,z,v2),formal(m,z,v1).
 chaFilter(type,name) :- cha(type,_,name).
 chaVirtual(type,m,name) :- cha(t,m,name),aT(t,type),aT(t,subclass),aT(subclass,type),chaFilter(subclass,name),!aT(type,t),!aT(subclass,t).
 chaReal(type,m,name) :- cha(t,m,name),aT(t,type),!chaVirtual(type,m,name).
+
+#
+vTfilter(v,t) :- vT(v,t_v),aT(t_v,t).
+vTc(c,v,t) :- vP0(v,h),IEc(c,i,_,_),actual(i,_,v),vPc(c,v,h),hT(h,t).
+vTc(c1,v1,t) :- assign2(c1,v1,c2,v2),vTc(c2,v2,t),vTfilter(v1,t).
+

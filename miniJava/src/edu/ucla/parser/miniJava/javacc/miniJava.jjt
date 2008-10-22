@@ -175,6 +175,7 @@ void ClassDeclaration() :
 	Variable var;
 	Function func;
 	Variable future_this;
+	Heap heap;
 }
 {
 	"class" t=Identifier()
@@ -182,12 +183,13 @@ void ClassDeclaration() :
 		s_id=new SymbId( t.image );
 		c=new Class( s_id, "", jjtThis.pos(jj_input_stream), null );
 
-		future_this=jjtThis._symbols.get(new SymbId( s_id,"this" ));
-		if( future_this==null )
-		{
-			future_this=new Variable( new SymbId(s_id,"this"), t.image,"","java" );
-			jjtThis._symbols.put( new SymbId(s_id,"this"), future_this );
-		}
+		future_this=new Variable( new SymbId(s_id,"this"), t.image,"","java" );
+		jjtThis._symbols.put( new SymbId(s_id,"this"), future_this );
+		
+		heap=new Heap( new SymbId("new "+t.image+"()"),t.image,"","class_declaration" );
+		jjtThis._heaps.add( heap );
+		jjtThis._vP0.add( new TwoSymbols(future_this, heap) );
+
 		jjtThis._types.put( s_id, c );
 	} 
   	"{" 
@@ -215,6 +217,7 @@ void ClassExtendsDeclaration() :
 	Variable var;
 	Function func;
 	Variable future_this;
+	Heap heap;
 }
 {
   "class" t=Identifier() "extends" parentClass=Identifier()
@@ -223,12 +226,13 @@ void ClassExtendsDeclaration() :
   		
   		c=new Class( s_id, "",jjtThis.pos(jj_input_stream), parentClass.image );
 		
-		future_this=jjtThis._symbols.get(new SymbId( s_id,"this" ));
-		if( future_this==null )
-		{
-			future_this=new Variable( new SymbId(s_id,"this"), t.image,"","java" );
-			jjtThis._symbols.put( new SymbId(s_id,"this"), future_this );
-		}
+		future_this=new Variable( new SymbId(s_id,"this"), t.image,"","java" );
+		jjtThis._symbols.put( new SymbId(s_id,"this"), future_this );
+		
+		heap=new Heap( new SymbId("new "+t.image+"()"),t.image,"","class_declaration" );
+		jjtThis._heaps.add( heap );
+		jjtThis._vP0.add( new TwoSymbols(future_this, heap) );
+		
   		jjtThis._types.put( s_id, c );
   }
   
@@ -691,6 +695,7 @@ Variable ArrayAllocationExpression(SymbId path)  :
 {
 	Heap heap;
 	String pos;
+	Variable var;
 }
 {
   { pos=jjtThis.pos(jj_input_stream); }
@@ -698,7 +703,13 @@ Variable ArrayAllocationExpression(SymbId path)  :
   {
 		heap=new Heap( new SymbId("new int[]"),"int[]","",pos );
 		jjtThis._heaps.add( heap );
-		return heap; 
+
+		var=new Variable( new SymbId( path,"new_int[]"),"int[]","",pos );
+		jjtThis._symbols.put( new SymbId( path,"new_int[]"+pos), var );
+
+		jjtThis._vP0.add( new TwoSymbols(var,heap) );
+		
+		return var; 
   }
 }
 
@@ -707,6 +718,7 @@ Variable AllocationExpression(SymbId path) :
 	Heap heap;
 	String pos;
 	Token t;
+	Variable var;
 }
 {
   { pos=jjtThis.pos(jj_input_stream); }
@@ -715,12 +727,10 @@ Variable AllocationExpression(SymbId path) :
 		heap=new Heap( new SymbId("new "+t.image+"()"),t.image,"",pos );
 		jjtThis._heaps.add( heap );
 		
-		Variable var=jjtThis._symbols.get( new SymbId(new SymbId( t.image ),"this") );
-		if( var==null ) 
-		{
-			var=new Variable( new SymbId(new SymbId( t.image ),"this"),t.image,"","java" );
-			jjtThis._symbols.put( new SymbId(new SymbId( t.image ),"this"), var );
-		}
+		var=new Variable( new SymbId( path,"new_"+t.image),t.image,"",pos );
+		jjtThis._symbols.put( new SymbId( path,"new_"+t.image+pos), var );
+		
+		jjtThis._vP0.add( new TwoSymbols(var,heap) );
 
 		return var;
   }

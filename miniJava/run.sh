@@ -1,0 +1,1 @@
+java -jar bdd.jar a5.datalog

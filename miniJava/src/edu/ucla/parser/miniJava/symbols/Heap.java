@@ -17,10 +17,10 @@ public class Heap extends Variable
 		super.resolveForwardDeclarations( n );
 		
 		if( _type_s=="int[]" ) return;
-		Variable var_this=n.variableLookup( "this", new SymbId(_type_s) );
-		if( var_this==this ) return;
-		
-		TwoSymbols vP0=new TwoSymbols(var_this,this);// var_this,this );
-		n._vP0.add( vP0 );
+//		Variable var_this=n.variableLookup( "this", new SymbId(_type_s) );
+//		if( var_this==this ) return;
+//		
+//		TwoSymbols vP0=new TwoSymbols(var_this,this);// var_this,this );
+//		n._vP0.add( vP0 );
 	}
 }

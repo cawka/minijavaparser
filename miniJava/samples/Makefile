@@ -1,10 +1,10 @@
-SOURCES=TestContexts.java TestClasses.java
-#SOURCES=Factorial.java  TestClasses.java TestContexts.java \
-#BinaryTree.java         LinearSearch.java       MoreThan4.java          TreeVisitor.java \
-#BubbleSort.java         LinkedList-error.java   \
-#LinkedList.java         QuickSort.java
+#SOURCES=TestContexts.java TestClasses.java
+SOURCES=Factorial.java  TestClasses.java TestContexts.java \
+BinaryTree.java         LinearSearch.java       MoreThan4.java          TreeVisitor.java \
+BubbleSort.java         LinkedList-error.java   \
+LinkedList.java         QuickSort.java
 
-all: a1 a2 a3 a4
+all: a1 a2 a3 a4 a5
 
 a1: $(SOURCES:.java=.a1) $(SOURCES:.java=.a1.datalog)
 
@@ -13,6 +13,8 @@ a2: $(SOURCES:.java=.a2) $(SOURCES:.java=.a2.datalog)
 a3: $(SOURCES:.java=.a3) $(SOURCES:.java=.a3.datalog)
 
 a4: $(SOURCES:.java=.a4) $(SOURCES:.java=.a4.datalog) $(SOURCES:.java=.a4.pdf)
+
+a5: $(SOURCES:.java=.a5) $(SOURCES:.java=.a5.datalog)
 
 datalog:
 	rm *.a1.datalog
@@ -59,6 +61,16 @@ datalog:
 	dot -Tpdf -o $(@:.a4.pdf=_cg_orig.pdf) ../benchmark/a4/$(@:.a4.pdf=)/call_graph_orig.dot
 	dot -Tpdf -o $(@:.a4.pdf=_a4_classes.pdf) ../benchmark/a4/$(@:.a4.pdf=)/class_diagram.dot
 
+%.a5: %.java
+	mkdir -p ../benchmark/a5/$(@:.a5=)
+	java -jar ../parser.jar ../benchmark/a5/$(@:.a5=) $(@:.a5=.java) a5 > ../benchmark/a5/$(@:.a5=)/_rules.txt
+	cp ../benchmark/a5/$(@:.a5=)/_rules.txt $@
+
+%.a5.datalog: ../a5.datalog
+	awk -v basedir=../benchmark/a5/$(@:.a5.datalog=) -f ../rebase-datalog.awk ../a5.datalog > $@
+	java -jar ../bdd.jar $@ > ../benchmark/a5/$(@:.a5.datalog=)/_bdd.log
+
+
 clean:
 	rm *.a1 || true
 	rm *.a1.datalog || true
@@ -68,6 +80,8 @@ clean:
 	rm *.a3.datalog || true
 	rm *.a4 || true
 	rm *.a4.datalog || true
+	rm *.a5 || true
+	rm *.a5.datalog || true
 	rm *.pdf || true
 
 
