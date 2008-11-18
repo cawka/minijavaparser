@@ -22,7 +22,7 @@ public class CallGraph
 	public static boolean find( Collection list, Object obj )
 	{
 		for( Iterator<Object> i=list.iterator(); i.hasNext(); )
-			if( obj.equals(obj) ) return true;
+			if( obj.equals(i.next()) ) return true;
 		
 		return false;
 	}
